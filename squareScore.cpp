@@ -39,5 +39,13 @@ int squareScore(char b[], int pos, char color, bool flip) {
 
     for (int dir = 0; dir < 8; dir++) {   // loop through each of the 8 possible directions
         iTemp = routeScore(b,neighbor(pos,dir),dir,color,flip);
+        if (iTemp)
+            iScore += iTemp - 1;
     }
+
+    if (iScore > 0 && flip)
+        b[pos] = color;
+
+    return iScore;
+
 }
