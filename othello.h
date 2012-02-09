@@ -24,14 +24,14 @@ const char H = 'O';         // Human's marker
 // prototypes
 
 int bsToAi(int, int);
-void aiToBs(int, int &, int *);
+void aiToBs(int, int &, int &);
 void getScore(char [], int &, int &);
 int neighbor(int, int);
 
-void setupBoard(char b[]);
-void displayBoard(char b[]);
-
-int squareScore(char b[], int pos, char color, bool flip);
-
+void setupBoard(char []);
+void displayBoard(char []);
+int validMoves(char [], char, int *, int *);
+int squareScore(char [], int, char, bool);
+int findBestMove(char [], char , bool );
 #endif	/* _OTHELLO_H */
 
