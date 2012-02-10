@@ -1,0 +1,11 @@
+Log of work:
+Day 1 - Spent coding the basic game.  I have done this portion in many different ways, 
+        but this is the first time doing it with a one-dimensional array.  Typically
+        I use a 2-d matrix of structures with color and an eight element array with 
+        pointers to each neighbor.
+
+Day 2 - Spent about 5 hours planning out the method of passing the data around.  I
+        figured it would be easier on paper than trying to code it in one shot.
+        
+        Also worked on getting environment configured to use NetBeans on Ubuntu with 
+        MPI.
