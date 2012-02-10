@@ -11,40 +11,65 @@
 
 #include "othello.h"
 
-int findBestMove(char b[BS], char color, bool flip) {
+int findBestMove(Communicator comm, char b[BS], char color, int depth=1) {
+	static WorkQueue workQueue;
 
-    int bestPosition = 0;
+	static stack<int> availableProcesses;
 
-    int possibleMoves[BS];
-    int scores[BS];
-    int i;
+	static char *rb = (char*)malloc(MAX_REQUEST_SIZE);
 
-    int valid = validMoves(b, color, possibleMoves, scores);
-    for (i = 0; i < BS; i++)
-        scores[i] = 0;
+	static int possibleMoves[BS];
+	static int scores[BS];
 
-    return bestPosition;
+	int i;
+	int bestPosition = 0;
+
+	for(i=1; i < comm.nprocs; i++) {
+		availableProcesses.push(i);
+	}
+	
+	validMoves(b, color, possibleMoves, scores);
+
+	for (i=0; possibleMoves[i]; i++) {
+		scores[possibleMoves[i]] = 0;
+		buildWorkRequest(rb,b,color,color,depth,possibleMoves[i]);
+		workQueue.push(rb);
+	}
+// we've made the initial request - now wait until we get all our answers back
+	while (workQueue.getOutstandingWork()) {
+		while (!workQueue.isEmpty() && availableProcesses.size()) {
+			workQueue.pop(rb);
+			comm.send(availableProcesses.top(), rb, strlen(rb)+1, TAG_DO_THIS_WORK);
+			availableProcesses.pop();
+		}
+		cout << "0\tWaiting for any source any tag\n";
+		int from;
+		int tag;
+		comm.probe(MPI_ANY_SOURCE, MPI_ANY_TAG,from,tag);
+		if (tag == )
+	}
+	return bestPosition;
 }
 int findBestMove1(char b[BS], char color, bool flip) {
 
-    int bestPosition = 0;
+	int bestPosition = 0;
 
-    int bestMoves[BS];
-    int possibleMoves[BS];
-    int scores[BS];
-    int i;
-    int cBM = 0;    // count of best moves
+	int bestMoves[BS];
+	int possibleMoves[BS];
+	int scores[BS];
+	int i;
+	int cBM = 0;	// count of best moves
 
-    int best = validMoves(b, color, possibleMoves, scores);
+	int best = validMoves(b, color, possibleMoves, scores);
 
-    int numWithBest = 0;
-    for (i = 0; possibleMoves[i]; i++) {
-        if (scores[i] == best) {
-            bestMoves[cBM++] = possibleMoves[i];
-        }
-    }
-    int bestIndex = rand() % cBM;
-    bestPosition = bestMoves[bestIndex];
-    squareScore(b, bestPosition, color, flip);
-    return bestPosition;
+	int numWithBest = 0;
+	for (i = 0; possibleMoves[i]; i++) {
+		if (scores[i] == best) {
+			bestMoves[cBM++] = possibleMoves[i];
+		}
+	}
+	int bestIndex = rand() % cBM;
+	bestPosition = bestMoves[bestIndex];
+	squareScore(b, bestPosition, color, flip);
+	return bestPosition;
 }

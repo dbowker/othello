@@ -5,39 +5,45 @@
  * Created on February 9, 2012, 4:41 PM
  */
 
-#include "Communicator.h"
+#include "othello.h"
 
-class Communicator {
-public:
-	int rank;
-	int nprocs;
-	Communicator(int &argc, char** &argv) {
+Communicator::Communicator(int &argc, char** &argv) {
 		MPI_Init(&argc, &argv);
-		MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-		MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-	}
-	template<class T>
-	void send(int dest, T* data, int size=1, int tag=1) {
-		// printf("%d\tsending %d bytes to %d\n",rank, size*sizeof(T), dest);
-		MPI_Send((void*)data,size*sizeof(T),MPI_CHAR, dest, tag, MPI_COMM_WORLD);
-	}
-	template<class T>
-	void recv(int source, T* data, int size=1, int tag=1) {
-		MPI_Status status;
-		// printf("%d\twaiting to receive up to %d bytes from %d\n",rank, size*sizeof(T), source);
-		MPI_Recv((void*)data,size*sizeof(T),MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
-		// printf("%d\treceived %d bytes from %d\n",rank, size*sizeof(T), source);
-	}
-	template<class T>
-	void bcast(int root, T* data, int size=1) {
-		MPI_Bcast((void*)data,size*sizeof(T), MPI_CHAR, root, MPI_COMM_WORLD);
-	}
-	float add(int root, float x) {
-		float y;
-		MPI_Reduce(&x, &y, 1, MPI_FLOAT, MPI_SUM, root, MPI_COMM_WORLD);
-		return y;
-	}
-
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
 }
 
+void Communicator::send(int dest, char* data, int size=1, int tag=1) {
+	cout << rank << "\tsending " << data << " (" << size << " chars) to " << dest << endl;
+	MPI_Send((void*)data,size,MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+}
+
+void Communicator::recv(int source, char* data, int size=1, int tag=1) {
+	MPI_Status status;
+	cout << rank << "\treceiving up to " << size << "bytes from " << source  << endl;
+	MPI_Recv((void*)data,size,MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
+	// printf("%d\treceived %d bytes from %d\n",rank, size*sizeof(T), source);
+}
+
+template<class T>
+void Communicator::bcast(int root, T* data, int size=1) {
+	MPI_Bcast((void*)data,size*sizeof(T), MPI_CHAR, root, MPI_COMM_WORLD);
+}
+
+float Communicator::add(int root, float x) {
+	float y;
+	MPI_Reduce(&x, &y, 1, MPI_FLOAT, MPI_SUM, root, MPI_COMM_WORLD);
+	return y;
+}
+
+void Communicator::finalize() {
+	MPI_Finalize();
+}
+
+void Communicator::probe(int fromWhere, int whichTag, int &actualFrom, int &actualTag) {
+	MPI_Status status;
+	MPI_Probe(fromWhere, whichTag, MPI_COMM_WORLD, &status);
+	actualFrom = status.MPI_SOURCE;
+	actualTag  = status.MPI_TAG;
+}
 

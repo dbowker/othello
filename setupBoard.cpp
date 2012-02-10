@@ -11,16 +11,16 @@
 #include "othello.h"
 
 void setupBoard(char b[BS]) {
-    int i;
+	int i;
 
-    for (i = 0; i < BS; i++)
-        b[i] = ' ';
+	for (i = 0; i < BS; i++)
+		b[i] = ' ';
 
-    b[bsToAi(4,4)] = C;
-    b[bsToAi(5,5)] = C;
+	b[bsToAi(4,4)] = C;
+	b[bsToAi(5,5)] = C;
 
-    b[bsToAi(4,5)] = H;
-    b[bsToAi(5,4)] = H;
+	b[bsToAi(4,5)] = H;
+	b[bsToAi(5,4)] = H;
 
 }
 

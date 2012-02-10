@@ -14,22 +14,22 @@
 
 int validMoves(char b[BS], char color, int *pVM, int *pS) {
 
-    int pos;
-    int score;
-    int highest = 0;
-    *pVM = 0;       // zero is the sentinal marking the end of valid moves,
+	int pos;
+	int score;
+	int highest = 0;
+	*pVM = 0;	   // zero is the sentinal marking the end of valid moves,
 
-    for(int r = 0; r < RL; r++) {
-        for (int c = 0; c < RL; c++) {
-            pos = bsToAi(r,c);
-            if (score = squareScore(b, pos, color, false)) {
-                *pVM++ = pos;
-                *pS++ = score;
-                *pVM = 0;
-                if (score > highest)
-                   highest = score;
-            }
-        }
-    }
-    return highest;
+	for(int r = 0; r < RL; r++) {
+		for (int c = 0; c < RL; c++) {
+			pos = bsToAi(r,c);
+			if (score = squareScore(b, pos, color, false)) {
+				*pVM++ = pos;
+				*pS++ = score;
+				*pVM = 0;
+				if (score > highest)
+				   highest = score;
+			}
+		}
+	}
+	return highest;  // if highest is 0 no valid moves exist
 }
