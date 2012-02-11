@@ -34,12 +34,14 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
+	${OBJECTDIR}/returnResult.o \
 	${OBJECTDIR}/squareScore.o \
 	${OBJECTDIR}/validMoves.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/Communicator.o \
 	${OBJECTDIR}/buildWorkRequest.o \
 	${OBJECTDIR}/WorkQueue.o \
+	${OBJECTDIR}/parseRequest.o \
 	${OBJECTDIR}/displayBoard.o \
 	${OBJECTDIR}/utilities.o \
 	${OBJECTDIR}/setupBoard.o \
@@ -71,6 +73,11 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/othello: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/othello ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
+${OBJECTDIR}/returnResult.o: returnResult.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/returnResult.o returnResult.cpp
+
 ${OBJECTDIR}/squareScore.o: squareScore.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
@@ -100,6 +107,11 @@ ${OBJECTDIR}/WorkQueue.o: WorkQueue.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/WorkQueue.o WorkQueue.cpp
+
+${OBJECTDIR}/parseRequest.o: parseRequest.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/parseRequest.o parseRequest.cpp
 
 ${OBJECTDIR}/displayBoard.o: displayBoard.cpp 
 	${MKDIR} -p ${OBJECTDIR}

@@ -14,14 +14,14 @@ Communicator::Communicator(int &argc, char** &argv) {
 }
 
 void Communicator::send(int dest, char* data, int size=1, int tag=1) {
-	cout << rank << "\tsending " << data << " (" << size << " chars) to " << dest << endl;
+//	cout << rank << "\tsending " << data << " (" << size << " chars) to " << dest << endl;
 	MPI_Send((void*)data,size,MPI_CHAR, dest, tag, MPI_COMM_WORLD);
 }
 
 void Communicator::recv(int source, char* data, int size=1, int tag=1) {
 	MPI_Status status;
-	cout << rank << "\treceiving up to " << size << "bytes from " << source  << endl;
-	MPI_Recv((void*)data,size,MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
+//	cout << rank << "\treceiving up to " << size << "bytes from " << source  << endl;
+	MPI_Recv((void*)data,size, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
 	// printf("%d\treceived %d bytes from %d\n",rank, size*sizeof(T), source);
 }
 

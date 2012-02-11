@@ -56,8 +56,13 @@ bool  WorkQueue::isEmpty() {
 }
 
 bool  WorkQueue::isFull() {
-	int freeSpace = (tail - head + qs) % qs;
-	return freeSpace > MAX_REQUEST_SIZE;
+	if (tail == head)
+		return false;
+
+	if (tail < head)
+		return qs - (head - tail) < MAX_REQUEST_SIZE;
+	
+	return (tail - head) < MAX_REQUEST_SIZE;
 }
 
 void WorkQueue::reset() {

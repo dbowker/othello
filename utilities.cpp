@@ -54,9 +54,15 @@ int numDigits(int num, int base) {
 	return result;
 }
 char* iToA(char* p, int num, int base, int numDig = 1) {
+	char* origP = p;
+	int   origNum = num;
 	numDig = max(numDig,numDigits(num,base));
+	if (num < 0) {
+		*p++ = '-';
+		num *= -1;
+	}
 	int whichDigit = pow(base,numDig - 1);
-	while (num) {
+	while (numDig--) {
 		int digit = num / whichDigit;
 		if (digit < 10) {
 			*p++ = digit + '0';
@@ -68,4 +74,27 @@ char* iToA(char* p, int num, int base, int numDig = 1) {
 	}
 	*p = 0;
 	return p;
+}
+
+int aToI(char* &p, int digits, int base) {
+	int result = 0;
+	bool negative = false;
+	if (*p == '-') {
+		p++;
+		negative = true;
+	} else if (*p == '+') {
+		p++;
+	}
+	while (digits-- > 0) {
+		if (*p <= '9') {
+			result = result*base + (*p++ - '0');
+		} else {
+			if (*p >= 'a') {
+				result = result*base + (*p++ - 'a');
+			} else {
+				result = result*base + (*p++ - 'A');
+			}
+		}
+	}
+	return result;
 }

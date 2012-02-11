@@ -58,8 +58,48 @@ int main(int argc, char** argv) {
 		bool done = false;
 		char* rb = (char*)malloc(MAX_REQUEST_SIZE);
 		do {
+			int possibleMoves[BS];
+			int scores[BS];
+
 			comm.recv(0, &rb[0], MAX_REQUEST_SIZE, TAG_DO_THIS_WORK);
-			cout << comm.rank << "\treceived this request for work " << rb << endl;
+			char color;
+			char origColor;
+			int  origMove;
+			int  depth;
+			int  move;
+			parseRequest(rb, b, color, origColor, origMove, depth, move);
+			cout << comm.rank << "\treceived this request  color:"<< color << " origColor:"<< origColor << "  origMove:" << origMove << "  depth:" << depth << "  move:" << move << endl;;
+			int tc,th;
+			getScore(b,tc,th);
+			cout << "score before flipping: H:" << th << " C:" << tc << endl;
+			squareScore(b,move,color,true);
+			cout << "score after  flipping: H:" << th << " C:" << tc << endl;
+			if (--depth) {
+				int numPossible = validMoves(b, color, possibleMoves, scores);
+//				cout << comm.rank << "\tNumber of possible moves: " << numPossible << endl;
+				if (numPossible > 0) {
+					for (int i=0; possibleMoves[i]; i++) {
+						scores[possibleMoves[i]] = 0;
+						buildWorkRequest(rb,b,color,origColor,origMove,depth,possibleMoves[i]);
+						comm.send(0,rb,strlen(rb)+1,TAG_WORK_TO_DO);
+					}
+				} else { // no valid moved for this player - try other
+					char otherColor = (color==C)?H:C;
+					numPossible = validMoves(b, otherColor, possibleMoves, scores);
+					if (numPossible > 0) {
+						for (int i=0; possibleMoves[i]; i++) {
+							scores[possibleMoves[i]] = 0;
+							buildWorkRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves[i]);
+							comm.send(0,rb,strlen(rb)+1,TAG_WORK_TO_DO);
+						}
+					} else { // neither player  has any moves return result
+						returnResult(comm,b,origColor,origMove);
+					}
+				}
+			} else {
+//				cout << "this is the last depth - return score\n";
+				returnResult(comm,b,origColor,origMove);				
+			}
 		} while (!done);
 	}
 	

@@ -40,13 +40,15 @@ void getScore(char [], int &, int &);
 int neighbor(int, int);
 char* iToA(char* , int, int, int);
 
+int aToI(char* &, int, int);
+
 void setupBoard(char []);
 void displayBoard(char []);
 int validMoves(char [], char, int *, int *);
 int squareScore(char [], int, char, bool);
 int findBestMove(Communicator, char [], char , int );
-char* buildWorkRequest(char*, char [], char, char, int, int);
-void sendRequest(Communicator, char *, int);
-
+char* buildWorkRequest(char*, char [], char, char,int, int, int);
+void parseRequest(char*, char [], char &, char &,int &, int &,int &);
+void returnResult(Communicator, char[], char, int);
 #endif	/* _OTHELLO_H */
 
