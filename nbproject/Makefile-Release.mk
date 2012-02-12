@@ -34,8 +34,9 @@ OBJECTDIR=${CND_BUILDDIR}/${CND_CONF}/${CND_PLATFORM}
 
 # Object Files
 OBJECTFILES= \
-	${OBJECTDIR}/returnResult.o \
 	${OBJECTDIR}/squareScore.o \
+	${OBJECTDIR}/returnResult.o \
+	${OBJECTDIR}/buildNextDepthRequest.o \
 	${OBJECTDIR}/validMoves.o \
 	${OBJECTDIR}/main.o \
 	${OBJECTDIR}/Communicator.o \
@@ -46,7 +47,8 @@ OBJECTFILES= \
 	${OBJECTDIR}/utilities.o \
 	${OBJECTDIR}/setupBoard.o \
 	${OBJECTDIR}/findBestMove.o \
-	${OBJECTDIR}/sendRequest.o
+	${OBJECTDIR}/sendRequest.o \
+	${OBJECTDIR}/parseNextDepthRequest.o
 
 
 # C Compiler Flags
@@ -73,15 +75,20 @@ ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/othello: ${OBJECTFILES}
 	${MKDIR} -p ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}
 	${LINK.cc} -o ${CND_DISTDIR}/${CND_CONF}/${CND_PLATFORM}/othello ${OBJECTFILES} ${LDLIBSOPTIONS} 
 
+${OBJECTDIR}/squareScore.o: squareScore.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/squareScore.o squareScore.cpp
+
 ${OBJECTDIR}/returnResult.o: returnResult.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/returnResult.o returnResult.cpp
 
-${OBJECTDIR}/squareScore.o: squareScore.cpp 
+${OBJECTDIR}/buildNextDepthRequest.o: buildNextDepthRequest.cpp 
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
-	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/squareScore.o squareScore.cpp
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/buildNextDepthRequest.o buildNextDepthRequest.cpp
 
 ${OBJECTDIR}/validMoves.o: validMoves.cpp 
 	${MKDIR} -p ${OBJECTDIR}
@@ -137,6 +144,11 @@ ${OBJECTDIR}/sendRequest.o: sendRequest.cpp
 	${MKDIR} -p ${OBJECTDIR}
 	${RM} $@.d
 	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/sendRequest.o sendRequest.cpp
+
+${OBJECTDIR}/parseNextDepthRequest.o: parseNextDepthRequest.cpp 
+	${MKDIR} -p ${OBJECTDIR}
+	${RM} $@.d
+	$(COMPILE.cc) -O2 -MMD -MP -MF $@.d -o ${OBJECTDIR}/parseNextDepthRequest.o parseNextDepthRequest.cpp
 
 # Subprojects
 .build-subprojects:

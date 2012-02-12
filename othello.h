@@ -29,6 +29,7 @@ const char C = 'X';		 // Computer's marker
 const char H = 'O';		 // Human's marker
 
 const int TAG_WORK_TO_DO = 0;
+const int TAG_TERMINATE = 1;
 const int TAG_DO_THIS_WORK = 3;
 const int TAG_RESULT = 4;
 
@@ -43,12 +44,16 @@ char* iToA(char* , int, int, int);
 int aToI(char* &, int, int);
 
 void setupBoard(char []);
-void displayBoard(char []);
+void displayBoard(char [], char color = H);
 int validMoves(char [], char, int *, int *);
 int squareScore(char [], int, char, bool);
 int findBestMove(Communicator, char [], char , int );
 char* buildWorkRequest(char*, char [], char, char,int, int, int);
+char* buildNextDepthRequest(char* rb, char[], char, char, int, int depth,int []);
 void parseRequest(char*, char [], char &, char &,int &, int &,int &);
 void returnResult(Communicator, char[], char, int);
+void parseRequest(char*, char [], char &, char &, int &, int &, int*);
+
+
 #endif	/* _OTHELLO_H */
 

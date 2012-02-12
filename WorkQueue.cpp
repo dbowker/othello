@@ -78,3 +78,12 @@ void WorkQueue::resultReceived() {
 int WorkQueue::getOutstandingWork() {
 	return outstandingWork;
 }
+
+void WorkQueue::printQueue() {
+	char rb[MAX_REQUEST_SIZE];
+	char* origTail = tail;
+	int count = 1;
+	while (!isEmpty())
+		cout << count << pop(rb) << endl;
+	tail = origTail;
+}

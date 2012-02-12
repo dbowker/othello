@@ -26,10 +26,15 @@
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
           <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 1</runcommandpicklistitem>
+          <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 2</runcommandpicklistitem>
+          <runcommandpicklistitem>mpirun -n 8 "${OUTPUT_PATH}" 8</runcommandpicklistitem>
+          <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 8</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>mpirun -n 2 "${OUTPUT_PATH}"</runcommand>
+        <runcommand>mpirun -n 2 "${OUTPUT_PATH}" 8</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
+        <console-type>1</console-type>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>

@@ -17,10 +17,12 @@
                    projectFiles="true">
       <itemPath>Communicator.cpp</itemPath>
       <itemPath>WorkQueue.cpp</itemPath>
+      <itemPath>buildNextDepthRequest.cpp</itemPath>
       <itemPath>buildWorkRequest.cpp</itemPath>
       <itemPath>displayBoard.cpp</itemPath>
       <itemPath>findBestMove.cpp</itemPath>
       <itemPath>main.cpp</itemPath>
+      <itemPath>parseNextDepthRequest.cpp</itemPath>
       <itemPath>parseRequest.cpp</itemPath>
       <itemPath>returnResult.cpp</itemPath>
       <itemPath>sendRequest.cpp</itemPath>

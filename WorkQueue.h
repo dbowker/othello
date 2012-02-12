@@ -20,6 +20,7 @@ public:
 	bool  isFull();
 	void  resultReceived();
 	int   getOutstandingWork();
+	void  printQueue();
 private:
 	int	  outstandingWork;
 	int   maxRequestSize;

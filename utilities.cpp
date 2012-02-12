@@ -23,9 +23,20 @@ void aiToBs(int index, int &row, int &col) {
 void getScore(char b[BS], int &comp, int &hum) {
 	comp = 0;
 	hum = 0;
-	for (int i = 0; i < BS; i++)
-		if (b[i] == C) comp++;
-		else if (b[i] == H) hum++;
+	int value = 1;
+	int r, c;
+	for (int i = 0; i < BS; i++) {
+		if (b[i] != ' ') {
+			value = 1;
+			aiToBs(i,r,c);
+			if (r == 1 || r == RL-2) value += 2;  // edge piece
+			if (c == 1 || c == RL-2) value += 2;  // edge piece
+			if (value == 6) value = 8;			  // corner piece
+
+			if (b[i] == C) comp += value;
+			else if (b[i] == H) hum += value;
+		}
+	}
 }
 int neighbor(int pos, int dir) {
 	switch (dir) {

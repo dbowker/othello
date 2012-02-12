@@ -10,7 +10,7 @@
 
 #include "othello.h"
 
-void displayBoard(char b[BS]) {
+void displayBoard(char b[BS], char color) {
 	int i,j;
 	int comp, hum;
 
@@ -30,7 +30,7 @@ void displayBoard(char b[BS]) {
 			if (b[bsToAi(i,j)] != ' ')
 				cout << " " << b[bsToAi(i,j)] << " |";
 			else
-				if (squareScore(b,bsToAi(i,j),H,false))
+				if (squareScore(b,bsToAi(i,j),color,false))
 					cout << " " << "*" << " |";
 				else
 					cout << " " << " " << " |";

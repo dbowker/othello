@@ -1,11 +1,20 @@
 Log of work:
+
+Pre   - Many hours of contemplating structure and logic of how to program the game.
+
 Day 1 - Spent coding the basic game.  I have done this portion in many different ways, 
-        but this is the first time doing it with a one-dimensional array.  Typically
+(2 hrs) but this is the first time doing it with a one-dimensional array.  Typically
         I use a 2-d matrix of structures with color and an eight element array with 
         pointers to each neighbor.
 
-Day 2 - Spent about 5 hours planning out the method of passing the data around.  I
-        figured it would be easier on paper than trying to code it in one shot.
+Day 2 - Planned out the method of passing the data around.  I
+(5 hrs) figured it would be easier on paper than trying to code it in one shot.
         
         Also worked on getting environment configured to use NetBeans on Ubuntu with 
         MPI.
+        
+Day 3 - Completed single process single level of logic and setup the structure for an 
+(6 hrs) infrastructure to handle multiple process
+
+Day 4 - Setup multi processing for multiple levels of think-a-head.  Have most of it
+(8 hrs) working, but not everything.

@@ -19,15 +19,18 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 	int highest = 0;
 	*pVM = 0;	   // zero is the sentinal marking the end of valid moves,
 
-	for(int r = 0; r < RL; r++) {
-		for (int c = 0; c < RL; c++) {
+	for(int r = 1; r < RL-1; r++) {
+		for (int c = 1; c < RL-1; c++) {
 			pos = bsToAi(r,c);
-			if (score = squareScore(b, pos, color, false)) {
-				*pVM++ = pos;
-				*pS++ = score;
-				*pVM = 0;
-				if (score > highest)
-				   highest = score;
+			if (b[pos] == ' ') {
+				score = squareScore(b, pos, color, false);
+				if (score) {
+					*pVM++ = pos;
+					*pS++ = score;
+					*pVM = 0;
+					if (score > highest)
+					   highest = score;
+				}
 			}
 		}
 	}

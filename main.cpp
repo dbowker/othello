@@ -22,6 +22,9 @@ int main(int argc, char** argv) {
 		int hMove;
 		bool validMove;
 
+		int depth = atoi(argv[1]);
+		cout << "RUnning depth: " << depth << endl;
+		
 		srand((int) time(NULL));
 		setupBoard(b);
 
@@ -36,6 +39,7 @@ int main(int argc, char** argv) {
 					if (r == 0 || c == 0)
 						break;
 					hMove = bsToAi(r,c);
+					cout << "You have chosen to move to " << hMove << endl;
 					validMove = false;
 					pVM = validHMoves;
 					while (*pVM && !validMove) {
@@ -45,14 +49,18 @@ int main(int argc, char** argv) {
 						cout << "\nNot a valid move.\nThe * on the board marks your possible moves\n\n";
 					else
 						squareScore(b,hMove,H,true);
-					int best = findBestMove(comm,b,C,1);
+					cout << "After your move the board is:\n";
+					displayBoard(b,C);
+					int best = findBestMove(comm,b,C,depth);
 					squareScore(b,best,C,true);
 					aiToBs(best, r, c);
 					cout << "Computer moves to [" << r << "," << c << "]\n";
 				} while (!validMove);
 			}
 		} while ((validCMoves[0] || validHMoves[0]) && (r != 0 && c != 0));
-
+		char terminate = 'T';
+		for(int i = 1; i < comm.nprocs; i++)
+			comm.send(i,&terminate,1,TAG_TERMINATE);
 		cout << "\n\nNO more valid moves\n\n";
 	} else { // not comm.rank 0
 		bool done = false;
@@ -60,7 +68,11 @@ int main(int argc, char** argv) {
 		do {
 			int possibleMoves[BS];
 			int scores[BS];
-
+			int from, tag;
+			comm.probe(0,MPI_ANY_TAG,from,tag);
+			if (tag == TAG_TERMINATE)
+				break;
+			
 			comm.recv(0, &rb[0], MAX_REQUEST_SIZE, TAG_DO_THIS_WORK);
 			char color;
 			char origColor;
@@ -68,30 +80,20 @@ int main(int argc, char** argv) {
 			int  depth;
 			int  move;
 			parseRequest(rb, b, color, origColor, origMove, depth, move);
-			cout << comm.rank << "\treceived this request  color:"<< color << " origColor:"<< origColor << "  origMove:" << origMove << "  depth:" << depth << "  move:" << move << endl;;
-			int tc,th;
-			getScore(b,tc,th);
-			cout << "score before flipping: H:" << th << " C:" << tc << endl;
+//			cout << comm.rank << "\treceived this request  color:"<< color << " origColor:"<< origColor << "  origMove:" << origMove << "  depth:" << depth << "  move:" << move << endl;;
 			squareScore(b,move,color,true);
-			cout << "score after  flipping: H:" << th << " C:" << tc << endl;
 			if (--depth) {
-				int numPossible = validMoves(b, color, possibleMoves, scores);
-//				cout << comm.rank << "\tNumber of possible moves: " << numPossible << endl;
-				if (numPossible > 0) {
-					for (int i=0; possibleMoves[i]; i++) {
-						scores[possibleMoves[i]] = 0;
-						buildWorkRequest(rb,b,color,origColor,origMove,depth,possibleMoves[i]);
+				char otherColor = (color==C)?H:C;
+				int highestScore = validMoves(b, otherColor, possibleMoves, scores);
+				if (highestScore > 0) {
+						buildNextDepthRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves);
+//						cout << comm.rank << "\tsending request for more work: " << rb<< endl;
 						comm.send(0,rb,strlen(rb)+1,TAG_WORK_TO_DO);
-					}
-				} else { // no valid moved for this player - try other
-					char otherColor = (color==C)?H:C;
-					numPossible = validMoves(b, otherColor, possibleMoves, scores);
-					if (numPossible > 0) {
-						for (int i=0; possibleMoves[i]; i++) {
-							scores[possibleMoves[i]] = 0;
-							buildWorkRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves[i]);
+				} else { // no valid moved for the other player - we get to go again.
+					highestScore = validMoves(b, color, possibleMoves, scores);
+					if (highestScore > 0) {
+							buildNextDepthRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves);
 							comm.send(0,rb,strlen(rb)+1,TAG_WORK_TO_DO);
-						}
 					} else { // neither player  has any moves return result
 						returnResult(comm,b,origColor,origMove);
 					}
