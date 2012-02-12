@@ -9,6 +9,7 @@
 #define	_OTHELLO_H
 #include <stdlib.h>
 #include <iostream>
+#include <iomanip>
 #include <ctime>
 #include <cstdlib>
 #include <cmath>
@@ -37,7 +38,7 @@ const int TAG_RESULT = 4;
 
 int bsToAi(int, int);
 void aiToBs(int, int &, int &);
-void getScore(char [], int &, int &);
+void getScore(char [], int &, int &, bool weighted=true);
 int neighbor(int, int);
 char* iToA(char* , int, int, int);
 
@@ -47,6 +48,7 @@ void setupBoard(char []);
 void displayBoard(char [], char color = H);
 int validMoves(char [], char, int *, int *);
 int squareScore(char [], int, char, bool);
+int getSquareValue(int);
 int findBestMove(Communicator, char [], char , int );
 char* buildWorkRequest(char*, char [], char, char,int, int, int);
 char* buildNextDepthRequest(char* rb, char[], char, char, int, int depth,int []);

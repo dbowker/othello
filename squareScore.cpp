@@ -20,13 +20,13 @@ int routeScore(char b[BS], int pos, int dir, char color, bool flip) {
 		if (iTemp) {
 			if (flip)
 				b[pos] = color;
-			return iTemp + 1;
+			return iTemp + getSquareValue(pos);
 		} else {
 			return 0;
 		}
 	} else {
 		if (b[pos] == color)
-			return 1;
+			return getSquareValue(pos);
 		else
 			return 0;
 	}
@@ -37,6 +37,11 @@ int squareScore(char b[], int pos, char color, bool flip) {
 	int iScore = 0;
 	int iTemp = 0;
 
+	int r, c;
+	aiToBs(pos,r,c);
+	if (r < 1 || c < 1 || c > RL-2 || r > RL - 2)
+		return 0;
+	
 	for (int dir = 0; dir < 8; dir++) {   // loop through each of the 8 possible directions
 		iTemp = routeScore(b,neighbor(pos,dir),dir,color,flip);
 		if (iTemp)

@@ -29,11 +29,11 @@ int main(int argc, char** argv) {
 		setupBoard(b);
 
 		do {
-			displayBoard(b);
 			validMoves(b,H,validHMoves,scoreHMoves);
 			validMoves(b,C,validCMoves,scoreCMoves);
 			if (validHMoves[0]) {
 				do {
+					displayBoard(b);
 					cout << "Your move [r,c]";
 					cin >> r >> c;
 					if (r == 0 || c == 0)
@@ -66,6 +66,7 @@ int main(int argc, char** argv) {
 		bool done = false;
 		char* rb = (char*)malloc(MAX_REQUEST_SIZE);
 		do {
+			int tempPossibleMoves[BS];
 			int possibleMoves[BS];
 			int scores[BS];
 			int from, tag;
@@ -84,7 +85,20 @@ int main(int argc, char** argv) {
 			squareScore(b,move,color,true);
 			if (--depth) {
 				char otherColor = (color==C)?H:C;
-				int highestScore = validMoves(b, otherColor, possibleMoves, scores);
+				int highestScore = validMoves(b, otherColor, tempPossibleMoves, scores);
+
+				if (otherColor != origColor) {  // move only the best moves
+					int *tpm = tempPossibleMoves;
+					int *pm = possibleMoves;
+					int *ts = scores;
+					while (*tpm) {
+						if (*ts++ == highestScore) {
+							*pm++ = *tpm;
+						}
+						tpm++;
+					}
+					*pm = 0;
+				}
 				if (highestScore > 0) {
 						buildNextDepthRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves);
 //						cout << comm.rank << "\tsending request for more work: " << rb<< endl;
