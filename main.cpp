@@ -27,17 +27,16 @@ int main(int argc, char** argv) {
 		
 		srand((int) time(NULL));
 		setupBoard(b);
-
 		do {
 			validMoves(b,H,validHMoves,scoreHMoves);
 			validMoves(b,C,validCMoves,scoreCMoves);
+			displayBoard(b);
 			if (validHMoves[0]) {
 				do {
-					displayBoard(b);
 					cout << "Your move [r,c]";
 					cin >> r >> c;
-					if (r == 0 || c == 0)
-						break;
+					if (r == 0 || c == 0) break;
+
 					hMove = bsToAi(r,c);
 					cout << "You have chosen to move to " << hMove << endl;
 					validMove = false;
@@ -45,17 +44,27 @@ int main(int argc, char** argv) {
 					while (*pVM && !validMove) {
 						validMove = (*pVM++ == hMove);
 					}
-					if (!validMove)
+					if (!validMove) {
 						cout << "\nNot a valid move.\nThe * on the board marks your possible moves\n\n";
-					else
-						squareScore(b,hMove,H,true);
-					cout << "After your move the board is:\n";
-					displayBoard(b,C);
-					int best = findBestMove(comm,b,C,depth);
-					squareScore(b,best,C,true);
-					aiToBs(best, r, c);
-					cout << "Computer moves to [" << r << "," << c << "]\n";
+						displayBoard(b);
+					}
 				} while (!validMove);
+				if (r == 0 || c == 0) break;
+
+				squareScore(b,hMove,H,true);
+				cout << "After your move the board is:\n";
+				displayBoard(b,C);
+			} else {
+				cout << "You Don't have any valid moves.\n";
+			}
+			cout << "Computer is plotting your demise.\n";
+			int best = findBestMove(comm,b,C,depth);
+			if (best != 0) {
+				squareScore(b,best,C,true);
+				aiToBs(best, r, c);
+				cout << "Computer moves to [" << r << "," << c << "]\n";
+			} else {
+				cout << "Computer does not have a valid move\n";
 			}
 		} while ((validCMoves[0] || validHMoves[0]) && (r != 0 && c != 0));
 		char terminate = 'T';

@@ -21,7 +21,7 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	static int originalPossibleMoves[BS];
 	static int possibleMoves[BS];
 	static int scores[BS];
-
+	int mostOutstanding = 0;
 	int i;
 	stack<int> bestPositions;
 	int bestScore = -1;
@@ -42,8 +42,10 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 //			cout << "0\tWork queue if full\n";
 		}
 	}
+	mostOutstanding = 0;
 // we've made the initial request - now wait until we get all our answers back
 	while (workQueue.getOutstandingWork()) {
+		mostOutstanding = max(mostOutstanding,workQueue.getOutstandingWork());
 //		workQueue.printQueue();
 //		cout << "outstanding requests: " << workQueue.getOutstandingWork() << endl;
 		while (!workQueue.isEmpty() && availableProcesses.size()) {
@@ -99,6 +101,7 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	} else {
 		bestPosition = 0;
 	}
+	cout << "Most Outstanding at one time: " << mostOutstanding << endl;
 	cout << "Choices with relative weights:\n";
 	int r,c;
 	for (i = 0; originalPossibleMoves[i]; i++) {

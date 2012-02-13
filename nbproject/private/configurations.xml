@@ -30,8 +30,9 @@
           <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 2</runcommandpicklistitem>
           <runcommandpicklistitem>mpirun -n 8 "${OUTPUT_PATH}" 8</runcommandpicklistitem>
           <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 8</runcommandpicklistitem>
+          <runcommandpicklistitem>mpirun -n 2 "${OUTPUT_PATH}" 15</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>mpirun -n 2 "${OUTPUT_PATH}" 8</runcommand>
+        <runcommand>mpirun -n 2 "${OUTPUT_PATH}" 15</runcommand>
         <rundir></rundir>
         <buildfirst>true</buildfirst>
         <console-type>1</console-type>

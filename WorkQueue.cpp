@@ -9,7 +9,7 @@
 #include "WorkQueue.h"
 
 WorkQueue::WorkQueue() {  // board size dictates the amount of memory to allocate
-	qs = BS*BS*(MAX_REQUEST_SIZE);
+	qs = BS*BS*BS*(MAX_REQUEST_SIZE);
 	queue = (char*)malloc(qs);
 	head = queue;
 	tail = queue;
