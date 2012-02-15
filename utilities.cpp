@@ -32,6 +32,23 @@ int getSquareValue(int pos) {
 	return value;
 }
 
+int getBoardValue(char b[BS], int &cScore, int &hScore, char color) {
+	cScore = 0;
+	hScore = 0;
+	for(int i = bsToAi(1,1); i <= bsToAi(RL-2,RL-2); i++) {
+		if (b[i] == C)
+			cScore += getSquareValue(i);
+		else if (b[i] == H)
+			hScore += getSquareValue(i);
+	}
+	if (color == C) {
+		return cScore - hScore;
+	} else {
+		return hScore - cScore;
+	}
+
+}
+
 void getScore(char b[BS], int &comp, int &hum, bool weighted) {
 	comp = 0;
 	hum = 0;

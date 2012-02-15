@@ -92,10 +92,14 @@ int main(int argc, char** argv) {
 			parseRequest(rb, b, color, origColor, origMove, depth, move);
 //			cout << comm.rank << "\treceived this request  color:"<< color << " origColor:"<< origColor << "  origMove:" << origMove << "  depth:" << depth << "  move:" << move << endl;;
 			squareScore(b,move,color,true);
+			cout << "checking to see if good choice for " << color << " board after move: (origColor: " << origColor << ")\n";
+			displayBoard(b);
 			if (--depth) {
 				char otherColor = (color==C)?H:C;
 				int highestScore = validMoves(b, otherColor, tempPossibleMoves, scores);
-
+				cout << "valid moved for " << otherColor << " with board values are:\n";
+				for (int i = 0; tempPossibleMoves[i]; i++)
+					cout << tempPossibleMoves[i] << " " << scores[i] << endl;
 				if (otherColor != origColor) {  // move only the best moves
 					int *tpm = tempPossibleMoves;
 					int *pm = possibleMoves;
@@ -107,6 +111,7 @@ int main(int argc, char** argv) {
 						tpm++;
 					}
 					*pm = 0;
+					
 				}
 				if (highestScore > 0) {
 						buildNextDepthRequest(rb,b,otherColor,origColor,origMove,depth,possibleMoves);

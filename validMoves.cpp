@@ -14,17 +14,23 @@
 
 int validMoves(char b[BS], char color, int *pVM, int *pS) {
 
-	int pos;
-	int score;
-	int highest = 0;
+	static int pos;
+	static int score;
+	static int highest = 0;
 	*pVM = 0;	   // zero is the sentinal marking the end of valid moves,
-
+	static char tB[BS];
+	static int delta, cScore, hScore;
+	score = 0;
+	
 	for(int r = 1; r < RL-1; r++) {
 		for (int c = 1; c < RL-1; c++) {
 			pos = bsToAi(r,c);
 			if (b[pos] == ' ') {
 				score = squareScore(b, pos, color, false);
 				if (score) {
+					strncpy(tB,b,BS);
+					squareScore(tB,pos,color,true);
+					delta = getBoardValue(tB,cScore,hScore,color);
 					*pVM++ = pos;
 					*pS++ = score;
 					*pVM = 0;
