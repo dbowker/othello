@@ -20,33 +20,70 @@ void aiToBs(int index, int &row, int &col) {
 	row = index / RL;
 }
 int getSquareValue(int pos) {
-	const int MIDDLE_PIECE = 1;
-	const int EDGE_PIECE = 8;
-	const int CORNER_PIECE = 99;
-	int r, c;
-	int value = 1;
-	aiToBs(pos,r,c);
-	if (r == 1 || r == RL-2) value += EDGE_PIECE;  // edge piece
-	if (c == 1 || c == RL-2) value += EDGE_PIECE;  // edge piece
-	if (value == MIDDLE_PIECE + 2*EDGE_PIECE) value = CORNER_PIECE;			  // corner piece
-	return value;
+	return 1;
 }
 
-int getBoardValue(char b[BS], int &cScore, int &hScore, char color) {
-	cScore = 0;
-	hScore = 0;
-	for(int i = bsToAi(1,1); i <= bsToAi(RL-2,RL-2); i++) {
-		if (b[i] == C)
-			cScore += getSquareValue(i);
-		else if (b[i] == H)
-			hScore += getSquareValue(i);
+int isRail(int pos) {
+	int r, c;
+	aiToBs(pos, r, c);
+	return (r < 1 || c < 1 || r > PA || c > PA);
+}
+
+int getBoardValue(char b[BS], char color) {
+	static int bv[BS];
+	int cScore = 0;
+	int hScore = 0;
+	int i, r, c;
+	int result = 0;
+	int tC = ' ';
+	int pos;
+	char cc;
+	// fill in all the "normal" square values
+	for (i = 0; i < BS; i++) 
+		bv[i] = (b[i] != ' ') ? NORMAL_PIECE : 0;
+
+	// top left
+	pos = 1;
+	cc = b[bsToAi(1,pos)];		// corner color
+	for (r=1; cc != ' ' && b[bsToAi(r,1)] == cc; r++) {
+		while (b[bsToAi(r,pos)] == cc)
+			bv[bsToAi(r,pos++)] = UNFLIPPABLE_PIECE;
+		pos = 1;
 	}
-	if (color == C) {
-		return cScore - hScore;
-	} else {
-		return hScore - cScore;
+	
+	// top right
+	pos = PA;
+	cc = b[bsToAi(1,pos)];		// corner color
+	for (r=1; cc != ' ' && b[bsToAi(r,PA)] == cc; r++) {
+		while (b[bsToAi(r,pos)] == cc)
+			bv[bsToAi(r,pos--)] = UNFLIPPABLE_PIECE;
+		pos = PA;
 	}
 
+	// bottom left
+	pos = 1;
+	cc = b[bsToAi(PA,pos)];		// corner color
+	for (r=PA; cc != ' ' && b[bsToAi(r,1)] == cc; r--) {
+		while (b[bsToAi(r,pos)] == cc)
+			bv[bsToAi(r,pos++)] = UNFLIPPABLE_PIECE;
+		pos = 1;
+	}
+
+
+	// bottom right
+	pos = PA;
+	cc = b[bsToAi(PA,pos)];		// corner color
+	for (r=PA; cc != ' ' && b[bsToAi(r,PA)] == cc; r--) {
+		while (b[bsToAi(r,pos)] == cc)
+			bv[bsToAi(r,pos--)] = UNFLIPPABLE_PIECE;
+		pos = PA;
+	}
+	for(i=0; i < BS; i++ ) {
+		if (b[i] == C) cScore += bv[i];
+		if (b[i] == H) hScore += bv[i];
+	}
+	displayBoardWithValues(bv);
+	return (color=C) ? cScore - hScore : hScore - cScore;
 }
 
 void getScore(char b[BS], int &comp, int &hum, bool weighted) {
@@ -131,4 +168,16 @@ int aToI(char* &p, int digits, int base) {
 		}
 	}
 	return result;
+}
+
+WorkResult* makeResult(WorkRequest* in) {
+	WorkResult* out = new WorkResult();
+	int i = 0;
+	for (i = 0; in->history[i];  i++) {
+		out->history[i] = in->history[i];
+		out->scores[i] = in->scores[i];
+	}
+	out->history[i] = 0;
+	out->boardValue = in->scores[i-1];
+	return out;
 }

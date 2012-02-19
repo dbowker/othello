@@ -10,125 +10,110 @@
  */
 
 #include "othello.h"
+#include <list>
+#include <queue>
+
 
 int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
-	static WorkQueue workQueue;
+	queue<WorkRequest*> workQueue;
 
 	static stack<int> availableProcesses;
-
-	static char *rb = (char*)malloc(MAX_REQUEST_SIZE);
-	static char *b = (char*)malloc(BS);
-	static int originalPossibleMoves[BS];
 	static int possibleMoves[BS];
 	static int scores[BS];
-	int mostOutstanding = 0;
+	
+	static list<WorkResult*> results[BS];
+	int totalWorkRequests = 0;
+	char dummy;
 	int i;
-	stack<int> bestPositions;
-	int bestScore = -1;
-	int bestPosition = 0;
+
+	WorkRequest* wReq = new WorkRequest();
+	WorkResult*  wRes = new WorkResult();
 	
 	for(i=1; i < comm.nprocs; i++) {
 		availableProcesses.push(i);
 	}
-	
-	validMoves(origB, color, originalPossibleMoves, scores);
 
-	for (i=0; originalPossibleMoves[i]; i++) {
-		scores[originalPossibleMoves[i]] = -1;
-		buildWorkRequest(rb,origB,color,color,originalPossibleMoves[i],depth,originalPossibleMoves[i]);
-		if (workQueue.push(rb)) {
-//			cout << "0\tJust queued the possible move of " << possibleMoves[i] << "  Current outstandingwork count: " << workQueue.getOutstandingWork() << endl;
-		} else {
-//			cout << "0\tWork queue if full\n";
-		}
+	validMoves(origB, color, possibleMoves, scores);
+
+	// seed the system - push all current valid moves onto the queue
+	cout << "Ready to queue possible moves.\n";
+	for (i=0; possibleMoves[i]; i++) {
+		wReq = new WorkRequest();
+		strncpy(wReq->b,origB,BS);
+		wReq->color = color;
+		wReq->depth = depth;
+		wReq->history[1] = 0;
+
+		results[possibleMoves[i]].clear();
+		wReq->history[0] = possibleMoves[i];
+		cout << "possibleMoves[i]: " << possibleMoves[i] << endl;
+		workQueue.push(wReq);
 	}
-	mostOutstanding = 0;
+	
 // we've made the initial request - now wait until we get all our answers back
-	while (workQueue.getOutstandingWork()) {
-		mostOutstanding = max(mostOutstanding,workQueue.getOutstandingWork());
+	while (availableProcesses.size() < comm.nprocs-1 || !workQueue.empty()) {
 //		workQueue.printQueue();
-//		cout << "outstanding requests: " << workQueue.getOutstandingWork() << endl;
-		while (!workQueue.isEmpty() && availableProcesses.size()) {
-			workQueue.pop(rb);
-			comm.send(availableProcesses.top(), rb, strlen(rb)+1, TAG_DO_THIS_WORK);
+//		cout << "0\tis about to see if it should send anything\n";
+		while (!workQueue.empty() && availableProcesses.size()) {
+			wReq = workQueue.front();
+			workQueue.pop();
+			comm.send(availableProcesses.top(),(char*) wReq, sizeof(WorkRequest), TAG_DO_THIS_WORK);
+			totalWorkRequests++;
 			availableProcesses.pop();
 		}
 		int from;
 		int tag;
-		comm.probe(MPI_ANY_SOURCE, MPI_ANY_TAG,from,tag);
-		if (tag == TAG_WORK_TO_DO) {
-			comm.recv(from,rb,MAX_REQUEST_SIZE, TAG_WORK_TO_DO);
-			char origColor;
-			int origMove;
-			parseRequest(rb, b, color, origColor, origMove, depth, possibleMoves);
-			for (i=0; possibleMoves[i]; i++) {
-				scores[possibleMoves[i]] = -1;
-				buildWorkRequest(rb,b,color,origColor,origMove,depth,possibleMoves[i]);
-				if (workQueue.push(rb)) {
-//					cout << "0\tJust queued the possible move of " << possibleMoves[i] << "  Current outstandingwork count: " << workQueue.getOutstandingWork() << endl;
-				} else {
-//					cout << "0\tWork queue if full\n";
-				}
-			}
-			availableProcesses.push(from);	
-			workQueue.resultReceived();  // not actually a result, just more work.
-			
-		} else if (tag == TAG_RESULT) {
-			int score;
-			int move;
-			int bufSize = (MOVE_DIGITS+1)*2+1;
-			char result[bufSize];  // Return two numbers plus null (leave room for sign)
-			char *p = &result[0];
-			workQueue.resultReceived();
-			comm.recv(from, result, bufSize, TAG_RESULT);
+//		cout << "0\tis about wait anything\n";
+		comm.probe(MPI_ANY_SOURCE, MPI_ANY_TAG,from,tag);	// wait for any communication from anywhere
+//		cout << "0\tTag: " << tag << " from " << from << endl;
+		if (tag == TAG_PROC_AVAILABLE) {
+			comm.recv(from, &dummy, 1, tag);
+//			cout << "0\tReceived AVAILABLE from " << from << endl;
 			availableProcesses.push(from);
-			score = aToI(p, 2, 10);
-			move = aToI(p, 2, 10);
-//			cout << "0\tResult received from " << from << " origMove:" << move << "  score:" << score << endl;
-			scores[move] = max(scores[move],score);
-			if (score > bestScore) {
-				bestScore = score;
-				while (!bestPositions.empty()) bestPositions.pop();
-				bestPositions.push(move);
-			}
-//			sleep(1);
+//			continue;						// loop back up to allow more work to be done
 		}
+		if (tag == TAG_TO_QUEUE) {
+			wReq = new WorkRequest();
+			comm.recv(from,(char*) wReq, sizeof(WorkRequest), tag);
+//			cout << "0\tReceived a TO_QUEUE request\n";
+			workQueue.push(wReq);  // not actually a result, just more work.
+//			cout << comm.rank << "\tqueued this request  color:"<< wReq->color << "  depth:" << wReq->depth << "  history:" << wReq->history[0] << " " << wReq->history[1] << " " << wReq->history[2] << " " << wReq->history[3] << " " << wReq->history[4] << " " << wReq->history[5] << " " << wReq->history[6] << " " << wReq->history[7] << " " << wReq->history[8] << " " << wReq->history[9] << " " << wReq->history[10] << " " << wReq->history[11] << " " << wReq->history[12] << " " << wReq->history[13] << " " << endl;
+//			continue;
+		}
+		if (tag == TAG_RESULT) {
+			wRes = new WorkResult();
+			comm.recv(from,(char*) wRes, sizeof(WorkResult), TAG_RESULT);
+//			cout << "0\tReceived a RESULT request\n";
+//			cout << "0\tresult's history is: " << " " << wRes->history[0] << " " << wRes->history[1] << " " << wRes->history[2] << " " << wRes->history[3] << endl;
+			results[wRes->history[0]].push_back(wRes);
+		}
+//		cout << "0\tap.size():" << availableProcesses.size() << " comm.nprocs-1: " << (comm.nprocs-1) << " wq.size:" << workQueue.size() << endl;
  	}
 //	sleep(3);
-	
-	if (bestPositions.size()) {
-		bestPosition = bestPositions.top();
-	} else {
-		bestPosition = 0;
-	}
-	cout << "Most Outstanding at one time: " << mostOutstanding << endl;
-	cout << "Choices with relative weights:\n";
-	int r,c;
-	for (i = 0; originalPossibleMoves[i]; i++) {
-		aiToBs(originalPossibleMoves[i],r,c);
-		cout << "Position [" << r << "," << c << "] value: " << scores[originalPossibleMoves[i]] << endl;
-	}
-	return bestPosition;
-}
-int findBestMove1(char b[BS], char color, bool flip) {
-
+	cout << "*********************************************" << endl;
+	cout << "***    all done processing possible moves  **" << endl;
+	cout << "*********************************************" << endl;
+	cout << "requests sent: " << totalWorkRequests << endl;
+	int bestValue = -99999;
 	int bestPosition = 0;
-
-	int bestMoves[BS];
-	int possibleMoves[BS];
-	int scores[BS];
-	int i;
-	int cBM = 0;	// count of best moves
-
-	int best = validMoves(b, color, possibleMoves, scores);
-
-	for (i = 0; possibleMoves[i]; i++) {
-		if (scores[i] == best) {
-			bestMoves[cBM++] = possibleMoves[i];
+	int j;
+	for (i=0; i < BS; i++) {
+		if (!results[i].empty()) {
+			cout << " results[" << i << "].size: " << results[i].size() << endl;
+			wRes = results[i].front();
+			results[i].pop_front();
+			cout << "Result: boardValue: " << wRes->boardValue  << " history";
+			for (j = 0; wRes->history[j];j++) {
+				cout << "\t\t" << setw(3) << wRes->history[j] << "\t" << setw(5) << wRes->scores[j] << endl;
+			}
+			if (bestValue < wRes->history[j-1]) {
+				bestValue = wRes->history[j-1];
+				bestPosition = wRes->history[0];
+			}
 		}
 	}
-	int bestIndex = rand() % cBM;
-	bestPosition = bestMoves[bestIndex];
-	squareScore(b, bestPosition, color, flip);
+	cout << "best position appears to be " << bestPosition << endl;
+
 	return bestPosition;
 }
+

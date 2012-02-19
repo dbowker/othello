@@ -19,8 +19,9 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 	static int highest = 0;
 	*pVM = 0;	   // zero is the sentinal marking the end of valid moves,
 	static char tB[BS];
-	static int delta, cScore, hScore;
-	score = 0;
+	static int cScore, hScore;
+	score = -9999;
+	int *t = pVM;
 	
 	for(int r = 1; r < RL-1; r++) {
 		for (int c = 1; c < RL-1; c++) {
@@ -30,7 +31,7 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 				if (score) {
 					strncpy(tB,b,BS);
 					squareScore(tB,pos,color,true);
-					delta = getBoardValue(tB,cScore,hScore,color);
+					score = getBoardValue(tB,color);
 					*pVM++ = pos;
 					*pS++ = score;
 					*pVM = 0;
@@ -40,5 +41,6 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 			}
 		}
 	}
+//	cout << "1\tValidMoves: " << *t << " " << *(t+1) << " " << *(t+2) << " " << *(t+3) << " " << *(t+4) << " " << *(t+5) << " " << *(t+6) << " " << *(t+7) << " " << *(t+8) << endl;
 	return highest;  // if highest is 0 no valid moves exist
 }
