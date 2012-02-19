@@ -18,3 +18,13 @@ Day 3 - Completed single process single level of logic and setup the structure f
 
 Day 4 - Setup multi processing for multiple levels of think-a-head.  Have most of it
 (8 hrs) working, but not everything.
+
+Days 5-? - Spent way too much time messing around with a bad communications model.  Rewrote
+           the communications to send as an object instead of a text string.  It's way better
+           and allows for easier modifications.
+2/19	Not sure what day this is, but today I had a successful run and got results I 
+        expected.  I setup a depth of 6 and received about 375,000 responses which confirms
+        that each move has an average of 8 choices (8.5^6 is about 375,000)
+        - left to do - how to decide which initial move to take based upon the 375,000 pieces
+        of data just computed.  My first thought is to scatter the data have each "first move"
+        computed down to a single value then pick the best one.
