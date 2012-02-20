@@ -16,7 +16,7 @@ Day 2 - Planned out the method of passing the data around.  I
 Day 3 - Completed single process single level of logic and setup the structure for an 
 (6 hrs) infrastructure to handle multiple process
 
-Day 4 - Setup multi processing for multiple levels of think-a-head.  Have most of it
+Day 4 - Setup multi processing for multiple levels of think-ahead.  Have most of it
 (8 hrs) working, but not everything.
 
 Days 5-? - Spent way too much time messing around with a bad communications model.  Rewrote

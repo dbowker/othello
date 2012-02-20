@@ -25,6 +25,8 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	int totalWorkRequests = 0;
 	char dummy;
 	int i;
+	int resultScores[BS];
+	int resultCount[BS] = {0};
 
 	WorkRequest* wReq = new WorkRequest();
 	WorkResult*  wRes = new WorkResult();
@@ -45,6 +47,9 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 		wReq->history[1] = 0;
 
 		results[possibleMoves[i]].clear();
+		resultScores[possibleMoves[i]] = 0;
+		resultCount[possibleMoves[i]] = 0;
+
 		wReq->history[0] = possibleMoves[i];
 		cout << "possibleMoves[i]: " << possibleMoves[i] << endl;
 		workQueue.push(wReq);
@@ -85,7 +90,10 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 			comm.recv(from,(char*) wRes, sizeof(WorkResult), TAG_RESULT);
 //			cout << "0\tReceived a RESULT request\n";
 //			cout << "0\tresult's history is: " << " " << wRes->history[0] << " " << wRes->history[1] << " " << wRes->history[2] << " " << wRes->history[3] << endl;
-			results[wRes->history[0]].push_back(wRes);
+//			results[wRes->history].push_back(wRes);
+			resultScores[wRes->history] += wRes->boardValue;
+			resultCount[wRes->history]++;
+//			cout << "Result: " << wRes->history << " " << wRes->boardValue << endl;
 		}
 //		cout << "0\tap.size():" << availableProcesses.size() << " comm.nprocs-1: " << (comm.nprocs-1) << " wq.size:" << workQueue.size() << endl;
  	}
@@ -94,6 +102,7 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	cout << "***    all done processing possible moves  **" << endl;
 	cout << "*********************************************" << endl;
 	cout << "requests sent: " << totalWorkRequests << endl;
+/*
 	int bestValue = -99999;
 	int bestPosition = 0;
 	int j;
@@ -112,7 +121,20 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 			}
 		}
 	}
-	cout << "best position appears to be " << bestPosition << endl;
+*/
+	double bestValue = -99999;
+	int bestPosition = 0;
+	cout << "All votes received:" << endl;
+	for (i=0; possibleMoves[i]; i++) {
+		int move = possibleMoves[i];
+		double finalScore = (double)resultScores[move] / (double)resultCount[move];
+		cout << "Position " << move << " final score: " << finalScore << " (" << resultScores[move] << "/" << resultCount[move] << ")" << endl;
+		if (bestValue < finalScore) {
+			bestValue = finalScore;
+			bestPosition = move;
+		}
+	}
+  	cout << "best position appears to be " << bestPosition << endl;
 
 	return bestPosition;
 }

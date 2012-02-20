@@ -172,12 +172,14 @@ int aToI(char* &p, int digits, int base) {
 
 WorkResult* makeResult(WorkRequest* in) {
 	WorkResult* out = new WorkResult();
+	int boardValue = 0;
 	int i = 0;
 	for (i = 0; in->history[i];  i++) {
-		out->history[i] = in->history[i];
-		out->scores[i] = in->scores[i];
+//		out->history[i] = in->history[i];
+//		out->scores[i] = in->scores[i];
+		boardValue += in->scores[i] / (i+1);
 	}
-	out->history[i] = 0;
-	out->boardValue = in->scores[i-1];
+	out->history = in->history[0];
+	out->boardValue = boardValue;
 	return out;
 }

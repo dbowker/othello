@@ -73,9 +73,6 @@ int main(int argc, char** argv) {
 			for (placeInHistory=0; wReq->history[placeInHistory]; placeInHistory++);
 			placeInHistory--;
 //			cout << comm.rank << "\treceived this request  color:"<< wReq->color << "  depth:" << wReq->depth << "  history:" << wReq->history[0] << " " << wReq->history[1] << " " << wReq->history[2] << " " << wReq->history[3] << " " << wReq->history[4] << " " << wReq->history[5] << " " << wReq->history[6] << " " << wReq->history[7] << " " << wReq->history[8] << " " << wReq->history[9] << " " << wReq->history[10] << " " << wReq->history[11] << " " << wReq->history[12] << " " << wReq->history[13] << " " << endl;
-			for (i = 0; i < 12; i++)
-				if (abs(wReq->history[i]) > BS)
-					exit(1);
 			squareScore(wReq->b, wReq->history[placeInHistory], wReq->color, true);
 			wReq->scores[placeInHistory] = getBoardValue(wReq->b,wReq->color);
 //			sleep(1);
@@ -83,7 +80,6 @@ int main(int argc, char** argv) {
 //			displayBoard(wReq->b);
 //			cout <<  wReq->color << " just moved to " << wReq->history[placeInHistory] << " and the board value is" << wReq->scores[placeInHistory] << endl;
 //			sleep(1);
-
 			if (--wReq->depth >= 0) {
 				do {
 					placeInHistory++;
@@ -113,6 +109,7 @@ int main(int argc, char** argv) {
 				} else { // for originalColor stop here
 					cout << "No valid moves (main.cpp 99)\n";
 					WorkResult* wRes = makeResult(wReq);
+					
 					comm.send(0, (char*) wRes, sizeof(WorkResult), TAG_RESULT);  // no valid moves
 				}
 			} else {

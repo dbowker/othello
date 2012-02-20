@@ -20,15 +20,14 @@ class Communicator {
 
 		void recv(int, char*, int, int);
 
-		template<class T>
-		void bcast(int, T*, int);
-
 		float add(int, float);
 		
 		void probe(int fromWhere, int whichTag, int &actualFrom, int &actualTag);
 		
 		void finalize();
 };
+
+using namespace std;
 
 #endif	/* _COMMUNICATOR_H */
 
