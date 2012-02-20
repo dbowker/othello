@@ -60,6 +60,7 @@ int main(int argc, char** argv) {
 	} else { // not comm.rank 0
 		bool done = false;
 		WorkRequest* wReq = new WorkRequest();
+                WorkResult*  wRes = new WorkResult();
 		do {
 			int from, tag;
 			comm.probe(0,MPI_ANY_TAG,from,tag);
@@ -107,13 +108,11 @@ int main(int argc, char** argv) {
 						comm.send(0,(char*) wReq, sizeof(WorkRequest), TAG_TO_QUEUE);
 					}
 				} else { // for originalColor stop here
-					cout << "No valid moves (main.cpp 99)\n";
-					WorkResult* wRes = makeResult(wReq);
-					
+					wRes = makeResult(wRes,wReq);
 					comm.send(0, (char*) wRes, sizeof(WorkResult), TAG_RESULT);  // no valid moves
 				}
 			} else {
-				WorkResult* wRes = makeResult(wReq);
+				makeResult(wRes, wReq);
 //				sleep(1);
 //				cout << "this is the last depth returning:\n";
 //				cout << "boardValue: " << wRes->boardValue << endl;

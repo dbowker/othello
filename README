@@ -22,9 +22,13 @@ Day 4 - Setup multi processing for multiple levels of think-ahead.  Have most of
 Days 5-? - Spent way too much time messing around with a bad communications model.  Rewrote
            the communications to send as an object instead of a text string.  It's way better
            and allows for easier modifications.
-2/19	Not sure what day this is, but today I had a successful run and got results I 
+2/19	Not sure what day number this is, but today I had a successful run and got results I 
         expected.  I setup a depth of 6 and received about 375,000 responses which confirms
         that each move has an average of 8 choices (8.5^6 is about 375,000)
         - left to do - how to decide which initial move to take based upon the 375,000 pieces
         of data just computed.  My first thought is to scatter the data have each "first move"
         computed down to a single value then pick the best one.
+2/20	Created a Bootable USB to allow for more control and use of multiple core processor
+        Cleaned up a few (known) memory leaks.  
+		(Left to do - clean up unused variables, remove debugging COUT statements that 
+		are currently commented out.)

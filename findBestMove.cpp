@@ -17,24 +17,23 @@
 int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	queue<WorkRequest*> workQueue;
 
-	static stack<int> availableProcesses;
-	static int possibleMoves[BS];
-	static int scores[BS];
-	
-	static list<WorkResult*> results[BS];
+	stack<int> availableProcesses;
+	int possibleMoves[BS];
+	int scores[BS];
+	WorkRequest* currentWReqs[comm.nprocs];
 	int totalWorkRequests = 0;
 	char dummy;
 	int i;
 	int resultScores[BS];
-	int resultCount[BS] = {0};
+	int resultCount[BS];
 
-	WorkRequest* wReq = new WorkRequest();
+	WorkRequest* wReq;// = new WorkRequest();
 	WorkResult*  wRes = new WorkResult();
 	
 	for(i=1; i < comm.nprocs; i++) {
 		availableProcesses.push(i);
+                currentWReqs[i] = NULL;
 	}
-
 	validMoves(origB, color, possibleMoves, scores);
 
 	// seed the system - push all current valid moves onto the queue
@@ -46,7 +45,6 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 		wReq->depth = depth;
 		wReq->history[1] = 0;
 
-		results[possibleMoves[i]].clear();
 		resultScores[possibleMoves[i]] = 0;
 		resultCount[possibleMoves[i]] = 0;
 
@@ -58,11 +56,13 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 // we've made the initial request - now wait until we get all our answers back
 	while (availableProcesses.size() < comm.nprocs-1 || !workQueue.empty()) {
 //		workQueue.printQueue();
-//		cout << "0\tis about to see if it should send anything\n";
+//		cout << "0\twQ.size: " << workQueue.size() << " avPr.size: " << availableProcesses.size() << endl;
 		while (!workQueue.empty() && availableProcesses.size()) {
 			wReq = workQueue.front();
 			workQueue.pop();
 			comm.send(availableProcesses.top(),(char*) wReq, sizeof(WorkRequest), TAG_DO_THIS_WORK);
+//			cout << "0\tSent " << wReq->history[0] << " to " << availableProcesses.top() << endl;
+			currentWReqs[availableProcesses.top()] = wReq;
 			totalWorkRequests++;
 			availableProcesses.pop();
 		}
@@ -70,6 +70,10 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 		int tag;
 //		cout << "0\tis about wait anything\n";
 		comm.probe(MPI_ANY_SOURCE, MPI_ANY_TAG,from,tag);	// wait for any communication from anywhere
+		if (currentWReqs[from] != NULL) {
+			delete currentWReqs[from];
+			currentWReqs[from] = NULL;
+		}
 //		cout << "0\tTag: " << tag << " from " << from << endl;
 		if (tag == TAG_PROC_AVAILABLE) {
 			comm.recv(from, &dummy, 1, tag);
@@ -86,14 +90,13 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 //			continue;
 		}
 		if (tag == TAG_RESULT) {
-			wRes = new WorkResult();
 			comm.recv(from,(char*) wRes, sizeof(WorkResult), TAG_RESULT);
 //			cout << "0\tReceived a RESULT request\n";
 //			cout << "0\tresult's history is: " << " " << wRes->history[0] << " " << wRes->history[1] << " " << wRes->history[2] << " " << wRes->history[3] << endl;
 //			results[wRes->history].push_back(wRes);
 			resultScores[wRes->history] += wRes->boardValue;
 			resultCount[wRes->history]++;
-//			cout << "Result: " << wRes->history << " " << wRes->boardValue << endl;
+//			cout << "0\tResult: " << wRes->history << " " << wRes->boardValue <<  " from " << from << endl;
 		}
 //		cout << "0\tap.size():" << availableProcesses.size() << " comm.nprocs-1: " << (comm.nprocs-1) << " wq.size:" << workQueue.size() << endl;
  	}

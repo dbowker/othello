@@ -65,7 +65,7 @@ void getScore(char [], int &, int &, bool weighted=true);
 int neighbor(int, int);
 char* iToA(char* , int, int, int);
 int aToI(char* &, int, int);
-WorkResult* makeResult(WorkRequest*);
+WorkResult* makeResult(WorkResult*, WorkRequest*);
 
 void setupBoard(char []);
 void displayBoard(char [], char color = H);

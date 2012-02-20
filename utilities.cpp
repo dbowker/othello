@@ -170,8 +170,7 @@ int aToI(char* &p, int digits, int base) {
 	return result;
 }
 
-WorkResult* makeResult(WorkRequest* in) {
-	WorkResult* out = new WorkResult();
+WorkResult* makeResult(WorkResult* out, WorkRequest* in) {
 	int boardValue = 0;
 	int i = 0;
 	for (i = 0; in->history[i];  i++) {
