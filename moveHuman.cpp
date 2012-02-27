@@ -20,7 +20,7 @@ int moveHuman(char b[BS], int validMoves[BS]) {
 	int* pVM;
 	
 	do {
-		cout << "Your move [r,c]";
+		cout << "Your move [r,c] (0 0 to terminate) ";
 		cin >> r >> c;
 		if (r == 0 || c == 0) break;
 

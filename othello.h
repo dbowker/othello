@@ -15,6 +15,8 @@
 #include <cmath>
 #include <stack>
 #include <string.h>
+#include <list>
+#include <queue>
 #include "Communicator.h"
 
 using namespace std;
@@ -26,6 +28,7 @@ const int MAX_POSSIBLE = BS / 3;
 const char C = 'X';		 // Computer's marker
 const char H = 'O';		 // Human's marker
 
+const int MAX_DEPTH = 10;
 const int TAG_TO_QUEUE = 0;
 const int TAG_TERMINATE = 1;
 const int TAG_PROC_AVAILABLE = 2;
@@ -44,17 +47,25 @@ public:
 	char b[BS];
 	char color;
 	char origColor;
-	int depth;
-	int history[PA*PA/2];
-	int scores[PA*PA/2];
+	char depth;
+	char history[MAX_DEPTH*2];
+	char scores[MAX_DEPTH*2];
 };
-
+class WorkAddition {
+public:
+	char b[BS];
+	char color;
+	char origColor;
+	char depth;
+	char history[MAX_DEPTH*2];			// these are really moves (int) not chars
+	char scores[MAX_DEPTH*2];
+	char additionalMoves[PA*PA / 2];
+};
 class WorkResult {
 public:
 	WorkResult(){}
 	int boardValue;
-	int history;//[PA*PA/2];
-//	int scores[PA*PA/2];
+	int history;
 };
 
 // prototypes
@@ -63,24 +74,24 @@ int bsToAi(int, int);
 void aiToBs(int, int &, int &);
 void getScore(char [], int &, int &, bool weighted=true);
 int neighbor(int, int);
-char* iToA(char* , int, int, int);
-int aToI(char* &, int, int);
+//char* iToA(char* , int, int, int);
+//int aToI(char* &, int, int);
 WorkResult* makeResult(WorkResult*, WorkRequest*);
 
 void setupBoard(char []);
 void displayBoard(char [], char color = H);
-void displayBoardWithValues(int []);
+//void displayBoardWithValues(int []);
 int validMoves(char [], char, int *, int *);
 int squareScore(char [], int, char, bool);
 int getSquareValue(int);
 int getBoardValue(char [],  char);
 int findBestMove(Communicator, char [], char , int );
-//char* buildWorkRequest(char*, char [], char, char,int, int, int, int*);
-//char* buildNextDepthRequest(char* rb, char[], char, char, int, int , int*, int*);
-//void parseRequest(char*, char [], char &, char &, int &, int &, int &, int*);
-//void parseNextDepthRequest(char*, char [], char &, char &, int &, int &, int *, int*);
 void returnResult(Communicator, char[], char, int, int*);
 int findOneLevelDeepBestMove(char [],char );
 int moveHuman(char [], int []);
+
+void makeWorkRequest(WorkRequest*, WorkAddition*, int);
+void makeWorkAddition(WorkAddition*, WorkRequest*, int[]);
+void processRequest(Communicator, WorkRequest*, int &, int [], int []);
 
 #endif	/* _OTHELLO_H */

@@ -23,12 +23,17 @@ int getSquareValue(int pos) {
 	return 1;
 }
 
-int isRail(int pos) {
-	int r, c;
-	aiToBs(pos, r, c);
-	return (r < 1 || c < 1 || r > PA || c > PA);
-}
+//int isRail(int pos) {
+//	int r, c;
+//	aiToBs(pos, r, c);
+//	return (r < 1 || c < 1 || r > PA || c > PA);
+//}
 
+// getBoardValue 
+// each square on the board is worth 1 point if there is on a chip on it
+// unless a chip can't be flipped
+// unflippable is determined if it's not possible for the piece to ever be
+// surrounded.  
 int getBoardValue(char b[BS], char color) {
 	static int bv[BS];
 	int cScore = 0;
@@ -38,10 +43,12 @@ int getBoardValue(char b[BS], char color) {
 	int tC = ' ';
 	int pos;
 	char cc;
+
 	// fill in all the "normal" square values
 	for (i = 0; i < BS; i++) 
 		bv[i] = (b[i] != ' ') ? NORMAL_PIECE : 0;
 
+	// from each corner determine if the chip can be flipped
 	// top left
 	pos = 1;
 	cc = b[bsToAi(1,pos)];		// corner color
@@ -78,14 +85,19 @@ int getBoardValue(char b[BS], char color) {
 			bv[bsToAi(r,pos--)] = UNFLIPPABLE_PIECE;
 		pos = PA;
 	}
+	
+	// determine total board value for each color
 	for(i=0; i < BS; i++ ) {
 		if (b[i] == C) cScore += bv[i];
 		if (b[i] == H) hScore += bv[i];
 	}
-	displayBoardWithValues(bv);
+	
+	// return the relative score for the color desired
 	return (color=C) ? cScore - hScore : hScore - cScore;
 }
-
+//
+//  return the chip count for each color
+//
 void getScore(char b[BS], int &comp, int &hum, bool weighted) {
 	comp = 0;
 	hum = 0;
@@ -98,6 +110,8 @@ void getScore(char b[BS], int &comp, int &hum, bool weighted) {
 		}
 	}
 }
+
+// which square is to the .... upper left, straight up...
 int neighbor(int pos, int dir) {
 	switch (dir) {
 		case 0: return pos - RL - 1; break;
@@ -112,73 +126,43 @@ int neighbor(int pos, int dir) {
 	return pos;
 }
 
-int numDigits(int num, int base) {
-	if (num < 0) 
-		return 0;
-	int result = 1;
-	int temp = base;
-	while (num > temp) {
-		temp *= base;
-		result++;
-	}
-		
-	return result;
-}
-char* iToA(char* p, int num, int base, int numDig = 1) {
-	char* origP = p;
-	int   origNum = num;
-	numDig = max(numDig,numDigits(num,base));
-	if (num < 0) {
-		*p++ = '-';
-		num *= -1;
-	}
-	int whichDigit = pow(base,numDig - 1);
-	while (numDig--) {
-		int digit = num / whichDigit;
-		if (digit < 10) {
-			*p++ = digit + '0';
-		} else {
-			*p++ = (digit-10) + 'a';
-		}
-		num = num - digit * whichDigit;
-		whichDigit /= base;
-	}
-	*p = 0;
-	return p;
-}
-
-int aToI(char* &p, int digits, int base) {
-	int result = 0;
-	bool negative = false;
-	if (*p == '-') {
-		p++;
-		negative = true;
-	} else if (*p == '+') {
-		p++;
-	}
-	while (digits-- > 0) {
-		if (*p <= '9') {
-			result = result*base + (*p++ - '0');
-		} else {
-			if (*p >= 'a') {
-				result = result*base + (*p++ - 'a');
-			} else {
-				result = result*base + (*p++ - 'A');
-			}
-		}
-	}
-	return result;
-}
-
 WorkResult* makeResult(WorkResult* out, WorkRequest* in) {
 	int boardValue = 0;
 	int i = 0;
-	for (i = 0; in->history[i];  i++) {
-//		out->history[i] = in->history[i];
-//		out->scores[i] = in->scores[i];
+	for (i = 0; in->history[i];  i++) {			// loop through history and weight each historical score
 		boardValue += in->scores[i] / (i+1);
 	}
-	out->history = in->history[0];
-	out->boardValue = boardValue;
+	out->history = in->history[0];				// original move is in history[0]
+	out->boardValue = boardValue;				// just computed value
 	return out;
+}
+
+void makeWorkAddition(WorkAddition* wAdd, WorkRequest* wReq, int moves[]) {
+	int i;
+	strncpy(wAdd->b,wReq->b,BS);
+	wAdd->color = wReq->color;
+	wAdd->origColor = wReq->origColor;
+	wAdd->depth = wReq->depth;
+	for(i=0; wReq->history[i]; i++) {
+		wAdd->history[i] = wReq->history[i];
+		wAdd->scores[i] = wReq->scores[i];
+	}
+	wAdd->history[i] = 0;
+	for(i=0; moves[i]; i++)
+		wAdd->additionalMoves[i] = moves[i];
+	wAdd->additionalMoves[i] = 0;
+}
+
+void makeWorkRequest(WorkRequest* wReq, WorkAddition* wAdd, int move) {
+	int i;
+	strncpy(wReq->b,wAdd->b,BS);
+	wReq->color = wAdd->color;
+	wReq->origColor = wAdd->origColor;
+	wReq->depth = wAdd->depth;
+	for(i=0; wAdd->history[i]; i++) {
+		wReq->history[i] = wAdd->history[i];
+		wReq->scores[i] = wAdd->scores[i];
+	}
+	wReq->history[i++] = move;
+	wReq->history[i] = 0;
 }

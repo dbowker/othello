@@ -48,7 +48,7 @@ void displayBoard(char b[BS], char color) {
 	int comp, hum;
 	int value;
 
-	cout << "\n   ";
+	cout << "\n  ";
 	for (j = 1; j < RL-1; j++)
 		cout << "  " << j << " ";
 	
@@ -73,7 +73,7 @@ void displayBoard(char b[BS], char color) {
 			}
 		}
 		cout << endl << "   ";
-		for (j = 1; j < RL-1; j++)  // 1 2
+		for (j = 1; j < RL-2; j++)  // 1 2
 			cout << "---|";
 		cout << "---\n";
 	}
