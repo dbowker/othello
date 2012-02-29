@@ -9,21 +9,17 @@
 #include "othello.h"
 
 int main(int argc, char** argv) {
-	char dummy = ' ';
 	char b[BS];
-	int r, c, i;
+	int r, c;
 	
 	Communicator comm(argc, argv);
 	int validHMoves[BS];
 	int validCMoves[BS];
 	int scoreHMoves[BS];
-	int scoreCMoves[BS];
-
+	validCMoves[0] = 0;
+	
 	if (comm.rank == 0) {
-		int *pVM;
-		int hMove;
-		bool validMove;
-
+		int hMove = 0;
 		int depth = atoi(argv[1]);
 		
 		srand((int) time(NULL));

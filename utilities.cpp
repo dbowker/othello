@@ -39,8 +39,6 @@ int getBoardValue(char b[BS], char color) {
 	int cScore = 0;
 	int hScore = 0;
 	int i, r, c;
-	int result = 0;
-	int tC = ' ';
 	int pos;
 	char cc;
 

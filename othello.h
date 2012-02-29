@@ -38,7 +38,7 @@ const int TAG_RESULT = 4;
 
 const int NORMAL_PIECE = 1;
 const int EDGE_PIECE = 25;
-const int UNFLIPPABLE_PIECE = 9999;
+const int UNFLIPPABLE_PIECE = 500;
 
 // data passing structures
 
@@ -50,8 +50,8 @@ public:
 	char color;
 	char origColor;
 	char depth;
-	char history[MAX_DEPTH*2];
-	char scores[MAX_DEPTH*2];
+	char history[MAX_DEPTH*2+1];
+	int  scores[MAX_DEPTH*2+1];
 };
 class WorkAddition {
 public:
@@ -59,15 +59,15 @@ public:
 	char color;
 	char origColor;
 	char depth;
-	char history[MAX_DEPTH*2];			// these are really moves (int) not chars
-	char scores[MAX_DEPTH*2];
+	char history[MAX_DEPTH*2+1];	// these are really moves (int) not chars
+	int  scores[MAX_DEPTH*2+1];
 	char additionalMoves[PA*PA / 2];
 };
 class WorkResult {
 public:
 	WorkResult(){}
-	int boardValue;
-	int history;
+	short boardValue;
+	char history;
 	int max;
 	int min;
 };

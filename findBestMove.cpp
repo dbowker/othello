@@ -18,7 +18,6 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	int possibleMoves[BS];
 	int scores[BS];
 	int totalWorkRequests = 0;
-	char dummy;
 	int i;
 	int resultScores[BS];
 	int resultMax[BS];
@@ -26,8 +25,6 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	int resultCount[BS];
 	
 	WorkRequest* wReq;// = new WorkRequest();
-	WorkResult*  wRes = new WorkResult();
-	WorkAddition* wAdd = new WorkAddition();
 	
 	validMoves(origB, color, possibleMoves, scores);
 

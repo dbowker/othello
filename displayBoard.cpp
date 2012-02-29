@@ -13,8 +13,6 @@
 void displayBoardWithValues(int b[BS]) {
 	return;
 	int i,j;
-	int comp, hum;
-	int value;
 
 	cout << "\n   ";
 	for (j = 0; j < RL-0; j++)   // 1 1
@@ -79,7 +77,8 @@ void displayBoard(char b[BS], char color) {
 	}
 
 	getScore(b,comp,hum,false);
-	cout << "Score:  Computer: " << comp << "   Human: " << hum << "\n\n";
+	cout << "Score:  Computer: " << comp << "   Human: " << hum << "\n";
+	cout << "Value:  Computer: " << getBoardValue(b,C) << "   Human: " << getBoardValue(b,H) << "\n\n";
 
 }
 

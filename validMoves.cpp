@@ -22,9 +22,7 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 	int bestPos = 0;
 	*pVM = 0;	   // zero is the sentinel marking the end of valid moves,
 	char tB[BS];
-	int cScore, hScore;
 	score = -LONG_MAX;
-	int *t = pVM;
 	
 	for(int r = 1; r < RL-1; r++) {
 		for (int c = 1; c < RL-1; c++) {

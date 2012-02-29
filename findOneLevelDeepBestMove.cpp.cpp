@@ -10,11 +10,8 @@
 
 int findOneLevelDeepBestMove(char b[BS],char color){
 
-	char tB[BS];
 	int possibleMoves[BS];
 	int scores[BS];
-	int bestScore = -LONG_MAX;
-	int bestMove = 0;
 	
 	return validMoves(b, color, possibleMoves, scores);  // valid moves returns best possible move
 	

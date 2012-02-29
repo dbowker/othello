@@ -9,9 +9,7 @@
 
 void worker(Communicator comm) {
 	int i;
-	int validHMoves[BS];
 	int validCMoves[BS];
-	int scoreHMoves[BS];
 	int scoreCMoves[BS];
 
 	bool done = false;
@@ -19,7 +17,6 @@ void worker(Communicator comm) {
 	WorkRequest* wReq = new WorkRequest();
 	WorkResult*  wRes = new WorkResult();
 	WorkAddition* wAdd = new WorkAddition();
-	int from, tag;
 	do {
 		// wait for some work
 		comm.recv(0, (char*) wReq, sizeof(WorkRequest), TAG_DO_THIS_WORK);
@@ -62,7 +59,8 @@ void worker(Communicator comm) {
 				validMoves(wReq->b,wReq->color, validCMoves, scoreCMoves);
 				// loop back if the computer doesn't have a valid move
 			} while (validCMoves[0] == 0 && wReq->history[placeInHistory] != 0);  // C can't move and H did
-//			cout << comm.rank << "\t" << placeInHistory << " C moved: " << (short)wReq->history[0] << " " << (short)wReq->scores[0] << ", " << (short)wReq->history[1] << " " << (short)wReq->scores[1] << ", " << wReq->history[2] << " " << wReq->scores[2] << endl;
+
+			// this level has been completed - prepare for next
 			placeInHistory++;
 			i = 0;
 			// send next level back to queue master
