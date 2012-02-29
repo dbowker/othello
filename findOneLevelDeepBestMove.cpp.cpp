@@ -13,16 +13,9 @@ int findOneLevelDeepBestMove(char b[BS],char color){
 	char tB[BS];
 	int possibleMoves[BS];
 	int scores[BS];
+	int bestScore = -LONG_MAX;
+	int bestMove = 0;
 	
-	validMoves(b, color, possibleMoves, scores);
+	return validMoves(b, color, possibleMoves, scores);  // valid moves returns best possible move
 	
-//	cout << "valid moved for " << color << " with board values are:\n";
-//	cout << "highest possible move is " << highestPossible << endl;
-
-	for (int i = 0; possibleMoves[i]; i++) {
-//		cout << possibleMoves[i] << " " << scores[i] << endl;
-//		if (scores[i] == highestPossible)
-			return possibleMoves[i];
-	}
-	return 0;
 }

@@ -6,6 +6,8 @@
  * Returns an array of possible moves for the color specified,  The array is
  * passed in as pVM  (pointer_ValidMoves), also return the possible scores for
  * each move
+ * 
+ * the function's returned value is the position with the best move.
  *
  * Created on February 8, 2012, 4:55 PM
  */
@@ -14,13 +16,14 @@
 
 int validMoves(char b[BS], char color, int *pVM, int *pS) {
 
-	static int pos;
-	static int score;
-	static int highest = 0;
-	*pVM = 0;	   // zero is the sentinal marking the end of valid moves,
-	static char tB[BS];
-	static int cScore, hScore;
-	score = -9999;
+	int pos;
+	int score;
+	int highestScore = -LONG_MAX;
+	int bestPos = 0;
+	*pVM = 0;	   // zero is the sentinel marking the end of valid moves,
+	char tB[BS];
+	int cScore, hScore;
+	score = -LONG_MAX;
 	int *t = pVM;
 	
 	for(int r = 1; r < RL-1; r++) {
@@ -32,15 +35,19 @@ int validMoves(char b[BS], char color, int *pVM, int *pS) {
 					strncpy(tB,b,BS);
 					squareScore(tB,pos,color,true);
 					score = getBoardValue(tB,color);
+//					if (color == H) {
+//						cout << "for color " << color << " just checked " << pos << " score = " << score << endl;
+//					}
 					*pVM++ = pos;
 					*pS++ = score;
 					*pVM = 0;
-					if (score > highest)
-					   highest = score;
+					if (score > highestScore) {
+						highestScore = score;
+						bestPos = pos;
+					}
 				}
 			}
 		}
 	}
-//	cout << "1\tValidMoves: " << *t << " " << *(t+1) << " " << *(t+2) << " " << *(t+3) << " " << *(t+4) << " " << *(t+5) << " " << *(t+6) << " " << *(t+7) << " " << *(t+8) << endl;
-	return highest;  // if highest is 0 no valid moves exist
+	return bestPos;  // if highest is 0 no valid moves exist
 }

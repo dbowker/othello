@@ -48,6 +48,15 @@ int getBoardValue(char b[BS], char color) {
 	for (i = 0; i < BS; i++) 
 		bv[i] = (b[i] != ' ') ? NORMAL_PIECE : 0;
 
+	for (c = 1; c <= PA; c++) {
+		r = 1;
+		bv[bsToAi(r,c)] = (b[bsToAi(r,c)] != ' ') ? EDGE_PIECE : 0;
+		bv[bsToAi(c,r)] = (b[bsToAi(c,r)] != ' ') ? EDGE_PIECE : 0;
+		r = PA;
+		bv[bsToAi(r,c)] = (b[bsToAi(r,c)] != ' ') ? EDGE_PIECE : 0;
+		bv[bsToAi(c,r)] = (b[bsToAi(c,r)] != ' ') ? EDGE_PIECE : 0;
+		
+	}
 	// from each corner determine if the chip can be flipped
 	// top left
 	pos = 1;
@@ -93,7 +102,7 @@ int getBoardValue(char b[BS], char color) {
 	}
 	
 	// return the relative score for the color desired
-	return (color=C) ? cScore - hScore : hScore - cScore;
+	return (color==C) ? cScore - hScore : hScore - cScore;
 }
 //
 //  return the chip count for each color
@@ -127,10 +136,16 @@ int neighbor(int pos, int dir) {
 }
 
 WorkResult* makeResult(WorkResult* out, WorkRequest* in) {
+	out->min = LONG_MAX;
+	out->max = -LONG_MAX;
 	int boardValue = 0;
 	int i = 0;
+//	cout << "Making result\n";
 	for (i = 0; in->history[i];  i++) {			// loop through history and weight each historical score
-		boardValue += in->scores[i] / (i+1);
+//		cout << (short) in->history[i] << " (" << (short)in->scores[i] << ")\n";
+		boardValue += (double)in->scores[i] / (double)((i+1)*(i+1));
+		if (in->scores[i] < out->min) out->min = in->scores[i];
+		if (in->scores[i] > out->max) out->max = in->scores[i];
 	}
 	out->history = in->history[0];				// original move is in history[0]
 	out->boardValue = boardValue;				// just computed value

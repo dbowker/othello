@@ -12,6 +12,7 @@
 #include <iomanip>
 #include <ctime>
 #include <cstdlib>
+#include <limits.h>
 #include <cmath>
 #include <stack>
 #include <string.h>
@@ -36,7 +37,8 @@ const int TAG_DO_THIS_WORK = 3;
 const int TAG_RESULT = 4;
 
 const int NORMAL_PIECE = 1;
-const int UNFLIPPABLE_PIECE = 99;
+const int EDGE_PIECE = 25;
+const int UNFLIPPABLE_PIECE = 9999;
 
 // data passing structures
 
@@ -66,6 +68,8 @@ public:
 	WorkResult(){}
 	int boardValue;
 	int history;
+	int max;
+	int min;
 };
 
 // prototypes
@@ -92,6 +96,6 @@ int moveHuman(char [], int []);
 
 void makeWorkRequest(WorkRequest*, WorkAddition*, int);
 void makeWorkAddition(WorkAddition*, WorkRequest*, int[]);
-void processRequest(Communicator, WorkRequest*, int &, int [], int []);
-
+void processRequest(Communicator, WorkRequest*, int &, int [], int [], int [], int []);
+void worker(Communicator);
 #endif	/* _OTHELLO_H */

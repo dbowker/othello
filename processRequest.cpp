@@ -11,7 +11,7 @@
 
 #include "othello.h"
 
-void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequests, int resultScores[], int resultCount[]) {
+void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequests, int resultScores[], int resultCount[], int resultMin[], int resultMax[]) {
 	int i, j;
 	int from;
 	int tag;
@@ -61,6 +61,8 @@ void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequest
 			comm.recv(from,(char*) wRes, sizeof(WorkResult), TAG_RESULT);
 			resultScores[wRes->history] += wRes->boardValue;
 			resultCount[wRes->history]++;
+			if (resultMin[wRes->history] > wRes->min) resultMin[wRes->history] = wRes->min ;
+			if (resultMax[wRes->history] < wRes->max) resultMax[wRes->history] = wRes->max ;
 		}
 		
 		availableProcesses.push(from);
