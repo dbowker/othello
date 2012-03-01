@@ -68,8 +68,6 @@ public:
 	WorkResult(){}
 	short boardValue;
 	char history;
-	int max;
-	int min;
 };
 
 // prototypes
@@ -96,6 +94,6 @@ int moveHuman(char [], int []);
 
 void makeWorkRequest(WorkRequest*, WorkAddition*, int);
 void makeWorkAddition(WorkAddition*, WorkRequest*, int[]);
-void processRequest(Communicator, WorkRequest*, int &, int [], int [], int [], int []);
+void processRequest(Communicator, WorkRequest*, int &, int [], int []);
 void worker(Communicator);
 #endif	/* _OTHELLO_H */

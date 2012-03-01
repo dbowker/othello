@@ -11,14 +11,14 @@
 
 #include "othello.h"
 
-void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequests, int resultScores[], int resultCount[], int resultMin[], int resultMax[]) {
+void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequests, int resultScores[], int resultCount[]) {
 	int i;
 	int from;
 	int tag;
 
 	int currentComputationalDepth = 99;
 
-	queue<WorkRequest*> workQueue;
+	stack<WorkRequest*> workQueue;
 	stack<int> availableProcesses;
 	WorkRequest* currentWReqs[comm.nprocs];
 
@@ -38,7 +38,7 @@ void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequest
 
 		// any work to be done and any processes available?
 		while (!workQueue.empty() && availableProcesses.size()) {
-			wReq = workQueue.front();
+			wReq = workQueue.top();
 			workQueue.pop();
 			// send a piece of work to the first available process
 			comm.send(availableProcesses.top(),(char*) wReq, sizeof(WorkRequest), TAG_DO_THIS_WORK);
@@ -69,8 +69,6 @@ void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequest
 			comm.recv(from,(char*) wRes, sizeof(WorkResult), TAG_RESULT);
 			resultScores[(int)wRes->history] += wRes->boardValue;
 			resultCount[(int)wRes->history]++;
-			if (resultMin[(int)wRes->history] > wRes->min) resultMin[(int)wRes->history] = wRes->min ;
-			if (resultMax[(int)wRes->history] < wRes->max) resultMax[(int)wRes->history] = wRes->max ;
 		}
 		
 		// put "from" back into the available processes queue and 

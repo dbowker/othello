@@ -32,3 +32,7 @@ Days 5-? - Spent way too much time messing around with a bad communications mode
         Cleaned up a few (known) memory leaks.  
 		(Left to do - clean up unused variables, remove debugging COUT statements that 
 		are currently commented out.)
+
+3/1		67.11ms time to process each board including MPI communications
+		32.94ms cpu time to process each board
+		Communications time is approx equal to processing time.

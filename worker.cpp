@@ -6,11 +6,19 @@
  */
 
 #include "othello.h"
+#include <time.h>
+
+
 
 void worker(Communicator comm) {
 	int i;
 	int validCMoves[BS];
 	int scoreCMoves[BS];
+
+	clock_t startTime, endTime;
+
+	int elapsedTime = 0;
+	int iterations = 0;
 
 	bool done = false;
 	int placeInHistory;
@@ -20,10 +28,16 @@ void worker(Communicator comm) {
 	do {
 		// wait for some work
 		comm.recv(0, (char*) wReq, sizeof(WorkRequest), TAG_DO_THIS_WORK);
+
+		startTime = clock();
+		
 		// if the first character of the board is a "T" then this is not really a
 		// work request but rather a sentinel marking "End of Game"
 		if (wReq->b[0] == 'T') {
 			cout << comm.rank << "\tReceived the terminate sentinel. \n";
+			cout << "total processor time: " << elapsedTime << endl;
+			cout << "total request count: " << iterations << endl;
+			cout << "average time: " << (double) elapsedTime / (double) iterations << "ms" << endl;
 			break;
 		}
 		char otherColor = wReq->color==C?H:C;
@@ -64,6 +78,11 @@ void worker(Communicator comm) {
 			placeInHistory++;
 			i = 0;
 			// send next level back to queue master
+
+			endTime = clock();
+			elapsedTime += (endTime - startTime);
+			iterations++;
+			
 			if (validCMoves[i] != 0) {
 				makeWorkAddition(wAdd, wReq, validCMoves);
 				comm.send(0,(char*) wAdd, sizeof(WorkAddition), TAG_TO_QUEUE);

@@ -10,19 +10,23 @@
  */
 
 #include "othello.h"
-
+#include <sys/time.h>
 
 int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
-	queue<WorkRequest*> workQueue;
 
 	int possibleMoves[BS];
 	int scores[BS];
 	int totalWorkRequests = 0;
 	int i;
 	int resultScores[BS];
-	int resultMax[BS];
-	int resultMin[BS];
 	int resultCount[BS];
+
+    struct timeval startTime, endTime;
+
+    long mtime, seconds, useconds;    
+
+    gettimeofday(&startTime, NULL);
+
 	
 	WorkRequest* wReq;// = new WorkRequest();
 	
@@ -39,19 +43,24 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 
 		resultScores[possibleMoves[whichPossibleMove]] = 0;
 		resultCount[possibleMoves[whichPossibleMove]] = 0;
-		resultMin[possibleMoves[whichPossibleMove]] = LONG_MAX;
-		resultMax[possibleMoves[whichPossibleMove]] = -LONG_MAX;
 		
 		wReq->history[0] = possibleMoves[whichPossibleMove];
-		//
-		// originally I had this out side of this loop.  But by reducing the number of
-		// initial states to start off - I can get an extra level of depth before
-		// memory is exhausted.
-		processRequest(comm, wReq, totalWorkRequests, resultScores, resultCount, resultMin, resultMax);
+
+		processRequest(comm, wReq, totalWorkRequests, resultScores, resultCount);
+
 		cout << comm.rank << "\tDone processing " << possibleMoves[whichPossibleMove] << endl;
 	}
 	delete wReq;
-	
+
+	gettimeofday(&endTime, NULL);
+
+    seconds  = endTime.tv_sec  - startTime.tv_sec;
+    useconds = endTime.tv_usec - startTime.tv_usec;
+
+    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
+
+	cout << "Elapsed time: " << mtime << "ms\n";
+
 	cout << "*********************************************" << endl;
 	cout << "***    all done processing possible moves  **" << endl;
 	cout << "*********************************************" << endl;
@@ -62,7 +71,7 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	for (i=0; possibleMoves[i]; i++) {
 		int move = possibleMoves[i];
 		double finalScore = (double)resultScores[move] / (double)resultCount[move];
-		cout << "Position " << move << " final score: " << finalScore << " (" << resultScores[move] << "/" << resultCount[move] << ")" << " [" << resultMin[move] << "," << resultMax[move] << "]" << endl;
+		cout << "Position " << move << " final score: " << finalScore << " (" << resultScores[move] << "/" << resultCount[move] << ")" << endl;
 		if (bestValue < finalScore) {
 			bestValue = finalScore;
 			bestPosition = move;

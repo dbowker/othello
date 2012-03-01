@@ -134,16 +134,12 @@ int neighbor(int pos, int dir) {
 }
 
 WorkResult* makeResult(WorkResult* out, WorkRequest* in) {
-	out->min = LONG_MAX;
-	out->max = -LONG_MAX;
 	int boardValue = 0;
 	int i = 0;
 //	cout << "Making result\n";
 	for (i = 0; in->history[i];  i++) {			// loop through history and weight each historical score
 //		cout << (short) in->history[i] << " (" << (short)in->scores[i] << ")\n";
 		boardValue += (double)in->scores[i] / (double)((i+1)*(i+1));
-		if (in->scores[i] < out->min) out->min = in->scores[i];
-		if (in->scores[i] > out->max) out->max = in->scores[i];
 	}
 	out->history = in->history[0];				// original move is in history[0]
 	out->boardValue = boardValue;				// just computed value
