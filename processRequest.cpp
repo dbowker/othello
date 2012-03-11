@@ -11,13 +11,13 @@
 
 #include "othello.h"
 
+
 void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequests, int resultScores[], int resultCount[]) {
 	int i;
 	int from;
 	int tag;
-
-	int currentComputationalDepth = 99;
-
+	int processorTime = 0;
+	
 	stack<WorkRequest*> workQueue;
 	stack<int> availableProcesses;
 	WorkRequest* currentWReqs[comm.nprocs];
@@ -79,5 +79,6 @@ void processRequest(Communicator comm, WorkRequest* inReq, int &totalWorkRequest
 			currentWReqs[from] = NULL;
 		}
  	}
+	return;
 
 }

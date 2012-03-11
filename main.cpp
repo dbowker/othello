@@ -6,19 +6,25 @@
  * Created on February 7, 2012, 7:12 PM
  */
 
-#include "othello.h"
+#include "othello.h" 
+
 
 int main(int argc, char** argv) {
 	char b[BS];
 	int r, c;
-	
+
+
 	Communicator comm(argc, argv);
 	int validHMoves[BS];
 	int validCMoves[BS];
 	int scoreHMoves[BS];
 	validCMoves[0] = 0;
-	
+	char buf[100];
+	ofstream outputFile;
 	if (comm.rank == 0) {
+		
+		sprintf(buf,"\n\nP = %d", comm.nprocs);
+		logIt(buf);
 		int hMove = 0;
 		int depth = atoi(argv[1]);
 		
@@ -28,7 +34,7 @@ int main(int argc, char** argv) {
 			validMoves(b,H,validHMoves,scoreHMoves);
 			displayBoard(b);
 			if (validHMoves[0]) {
-				hMove = moveHuman(b,validHMoves);
+				hMove = moveHuman(b,validHMoves);	// to get a manually entered move
 				if (hMove == 0) {
 					break;
 				}
@@ -39,7 +45,7 @@ int main(int argc, char** argv) {
 			}
 			cout << "Computer is plotting your demise.\n";
 
-			int best = findBestMove(comm,b,C,depth);
+			int best = findBestMove(comm, b, C, depth);
 
 			if (best != 0) {
 				squareScore(b,best,C,true);

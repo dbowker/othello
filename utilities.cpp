@@ -175,3 +175,27 @@ void makeWorkRequest(WorkRequest* wReq, WorkAddition* wAdd, int move) {
 	wReq->history[i++] = move;
 	wReq->history[i] = 0;
 }
+
+void logIt(long num) {
+	char buf[50];
+	sprintf(buf,"%9.2f",(float)num/1000000);
+//	sprintf(buf,"%d",num);
+	logIt(buf);
+}
+
+void logIt(char* text) {
+	static ofstream outputFile;
+	if (!outputFile.is_open()) {
+		outputFile.open("othello.log",ios::app);
+	}
+	outputFile << text << "\n";
+	cout << text << endl;
+	
+	outputFile.flush();
+}
+
+int elapsedTime(struct timeval *t2, struct timeval *t1) {
+
+    return  (t2->tv_usec + 1000000 * t2->tv_sec) - (t1->tv_usec + 1000000 * t1->tv_sec);
+   
+}

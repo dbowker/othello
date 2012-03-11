@@ -1,4 +1,4 @@
-/* 
+/*
  * File:   othello.h
  * Author: dan
  *
@@ -7,6 +7,7 @@
 
 #ifndef _OTHELLO_H
 #define	_OTHELLO_H
+
 #include <stdlib.h>
 #include <iostream>
 #include <iomanip>
@@ -17,12 +18,12 @@
 #include <stack>
 #include <string.h>
 #include <list>
-#include <queue>
+#include <fstream>
 #include "Communicator.h"
 
 using namespace std;
 const int PA = 8;			// play area
-const int RL = (PA + 2);	// Row length of the board 
+const int RL = (PA + 2);	// Row length of the board
 const int BS = RL * RL;		// board size is a square 8 plus padding
 const int MAX_POSSIBLE = BS / 3;
 
@@ -46,29 +47,34 @@ class WorkRequest {
 public:
 	WorkRequest(){}
 
-	char b[BS];
-	char color;
-	char origColor;
-	char depth;
-	char history[MAX_DEPTH*2+1];
-	int  scores[MAX_DEPTH*2+1];
-};
+	char b[BS];						// 100
+	char color;						//   1
+	char origColor;					//   1
+	char depth;						//   1
+	char history[MAX_DEPTH*2+1];	//	21
+	int  scores[MAX_DEPTH*2+1];		//  84
+};                                  // 208 <-- total byte count
+
 class WorkAddition {
 public:
-	char b[BS];
-	char color;
-	char origColor;
-	char depth;
-	char history[MAX_DEPTH*2+1];	// these are really moves (int) not chars
-	int  scores[MAX_DEPTH*2+1];
-	char additionalMoves[PA*PA / 2];
-};
+	char b[BS];						// 100
+	char color;						//   1
+	char origColor;					//   1
+	char depth;						//   1
+	char history[MAX_DEPTH*2+1];	//  21
+	int  scores[MAX_DEPTH*2+1];		//  84
+	char additionalMoves[PA*PA / 2];//  32
+	int  processorTime;				//   4
+};									// 244 <-- total byte count
+
 class WorkResult {
 public:
 	WorkResult(){}
-	short boardValue;
-	char history;
-};
+	int  boardValue;				//	4
+	char history;					//  1
+	int  processorTime;				//  4
+};									//  9 <-- total byte count
+
 
 // prototypes
 
@@ -76,8 +82,6 @@ int bsToAi(int, int);
 void aiToBs(int, int &, int &);
 void getScore(char [], int &, int &, bool weighted=true);
 int neighbor(int, int);
-//char* iToA(char* , int, int, int);
-//int aToI(char* &, int, int);
 WorkResult* makeResult(WorkResult*, WorkRequest*);
 
 void setupBoard(char []);
@@ -87,7 +91,7 @@ int validMoves(char [], char, int *, int *);
 int squareScore(char [], int, char, bool);
 int getSquareValue(int);
 int getBoardValue(char [],  char);
-int findBestMove(Communicator, char [], char , int );
+int findBestMove(Communicator, char [], char , int);
 void returnResult(Communicator, char[], char, int, int*);
 int findOneLevelDeepBestMove(char [],char );
 int moveHuman(char [], int []);
@@ -96,4 +100,7 @@ void makeWorkRequest(WorkRequest*, WorkAddition*, int);
 void makeWorkAddition(WorkAddition*, WorkRequest*, int[]);
 void processRequest(Communicator, WorkRequest*, int &, int [], int []);
 void worker(Communicator);
+void logIt(char*);
+void logIt(long);
+int elapsedTime(struct timeval *, struct timeval *);
 #endif	/* _OTHELLO_H */

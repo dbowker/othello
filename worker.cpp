@@ -78,22 +78,24 @@ void worker(Communicator comm) {
 			placeInHistory++;
 			i = 0;
 			// send next level back to queue master
-
 			endTime = clock();
-			elapsedTime += (endTime - startTime);
+			elapsedTime += (endTime - startTime)/1000;
 			iterations++;
 			
 			if (validCMoves[i] != 0) {
 				makeWorkAddition(wAdd, wReq, validCMoves);
+				wAdd->processorTime = elapsedTime;
 				comm.send(0,(char*) wAdd, sizeof(WorkAddition), TAG_TO_QUEUE);
 			} else {
 				// no one has any valid moves on this path - return result
 				wRes = makeResult(wRes,wReq);
+				wRes->processorTime = elapsedTime;
 				comm.send(0, (char*) wRes, sizeof(WorkResult), TAG_RESULT);  // no valid moves
 			}
 		} else {
 			// no more levels to process.
 			makeResult(wRes, wReq);
+			wRes->processorTime = elapsedTime;
 			comm.send(0, (char*) wRes, sizeof(WorkResult), TAG_RESULT);  // no valid moves
 		}
 	} while (!done);

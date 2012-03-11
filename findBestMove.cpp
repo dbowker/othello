@@ -12,7 +12,11 @@
 #include "othello.h"
 #include <sys/time.h>
 
-int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
+int findBestMove(Communicator comm, char origB[BS], char color, int depth) {
+
+	int wallClockTime;
+	int processorTime;
+	int boardCount;
 
 	int possibleMoves[BS];
 	int scores[BS];
@@ -20,12 +24,10 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	int i;
 	int resultScores[BS];
 	int resultCount[BS];
-
+	char logBuffer[200];
     struct timeval startTime, endTime;
 
-    long mtime, seconds, useconds;    
-
-    gettimeofday(&startTime, NULL);
+	gettimeofday(&startTime, NULL);
 
 	
 	WorkRequest* wReq;// = new WorkRequest();
@@ -35,6 +37,9 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 	// seed the system - push all current valid moves onto the queue one at a time
 	cout << "Ready to process possible moves.\n";
 	wReq = new WorkRequest();
+	processorTime = 0;
+	boardCount = 0;
+	wallClockTime = 0;
 	for (int whichPossibleMove=0; possibleMoves[whichPossibleMove]; whichPossibleMove++) {
 		strncpy(wReq->b,origB,BS);
 		wReq->color = color;
@@ -47,24 +52,20 @@ int findBestMove(Communicator comm, char origB[BS], char color, int depth=1) {
 		wReq->history[0] = possibleMoves[whichPossibleMove];
 
 		processRequest(comm, wReq, totalWorkRequests, resultScores, resultCount);
-
 		cout << comm.rank << "\tDone processing " << possibleMoves[whichPossibleMove] << endl;
 	}
 	delete wReq;
 
 	gettimeofday(&endTime, NULL);
-
-    seconds  = endTime.tv_sec  - startTime.tv_sec;
-    useconds = endTime.tv_usec - startTime.tv_usec;
-
-    mtime = ((seconds) * 1000 + useconds/1000.0) + 0.5;
-
-	cout << "Elapsed time: " << mtime << "ms\n";
-
+	
+	int elapsed = elapsedTime(&endTime, &startTime);
+	logIt(elapsed);
+	
 	cout << "*********************************************" << endl;
 	cout << "***    all done processing possible moves  **" << endl;
 	cout << "*********************************************" << endl;
 	cout << "requests sent: " << totalWorkRequests << endl;
+
 
 	double bestValue = -9.0e100;
 	int bestPosition = 0;
